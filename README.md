@@ -19,7 +19,7 @@ The conversion process happens in two steps:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/pdf-accessible-html-converter
+   git clone https://github.com/unicef/pdf-accessible-html-converter
    cd pdf-accessible-html-converter
    ```
 
