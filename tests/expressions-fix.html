@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Document</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<style>
+/* Improved math styling */
+.math {
+  font-family: 'STIX Two Math', 'Latin Modern Math', serif;
+}
+mjx-container {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+.mjx-full-width {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Document</h1>
+</header>
+<h2 id="text">Text</h2>
+<ol start="13" type="1">
+<li>You could have created an equation to represent many of the problems
+on the previous page. For example, in #2, you were asked:
+<!-- text, from page 0 $l=0.060,t=0.047,r=0.922,b=0.080$, with ID 01e2daf4-29d3-42b3-820c-c7e9c2eba4c0 --></li>
+</ol>
+<p>What value for <span class="math inline">$x$</span> makes the
+expression <span class="math inline">$x + 5$</span> equal to 7? In
+other words, when does the expression <span class="math inline">\(x +
+5\)</span> equal 7? An <strong>equation</strong> is formed by setting
+two expressions equal to each other.
+<!-- text, from page 0 $l=0.086,t=0.099,r=0.915,b=0.133$, with ID c1231fa3-bbbb-4d69-9d18-99a412074387 --></p>
+<h2 id="detailed-description">Detailed Description</h2>
+<p>The image is a diagram illustrating the concept of an equation. It
+shows two mathematical expressions separated by an equal sign,
+indicating that they are equal to each other.</p>
+<ul>
+<li><strong>Equation</strong>: The equation displayed is <span
+class="math inline">\$x + 5 = 7\$</span>.
+<ul>
+<li><strong>Expression 1</strong>: <span class="math inline">\(x +
+5\)</span></li>
+<li><strong>Expression 2</strong>: <span
+class="math inline">\(7\)</span></li>
+</ul></li>
+<li><strong>Annotations</strong>:
+<ul>
+<li>A yellow arrow points to the equal sign, labeled with the text
+<code>"is equal to"</code>.</li>
+<li>Below the equation, there are labels:
+<ul>
+<li><strong>Expression 1</strong> is labeled under <span
+class="math inline">\(x + 5\)</span>.</li>
+<li><strong>Expression 2</strong> is labeled under <span
+class="math inline">\(7\)</span>.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p>This diagram visually explains that the two expressions on either
+side of the equal sign are equivalent.
+<!-- figure, from page 0 $l=0.410,t=0.165,r=0.642,b=0.281$, with ID 9385155c-5fc4-4643-81c5-166b6a654b1f --></p>
+<p>A <strong>solution</strong> to an equation is a number that
+<strong>makes the equation true</strong> when substituted for the
+unknown. Another way to think of this is to ask the question, “For what
+value of <span class="math inline">$x$</span> does the expression
+<span class="math inline">$x + 5$</span> evaluate to 7?”
+<!-- text, from page 0 $l=0.058,t=0.323,r=0.929,b=0.354$, with ID 3418e142-9108-4c5f-a6f1-bdbfaee579a9 --></p>
+<h2 id="directions">Directions</h2>
+<p>Determine whether the given number is the solution to the equation
+given. Justify your answer.
+<!-- text, from page 0 $l=0.058,t=0.374,r=0.900,b=0.389$, with ID 20c1253e-f9bb-4d9f-ae4a-8e250dbde8f3 --></p>
+<h3 id="table-of-equations-and-solutions">Table of Equations and
+Solutions</h3>
+<p>This table presents a series of equations with proposed solutions.
+Each row contains an equation, followed by a question asking if a
+specific value of ( x ) satisfies the equation.</p>
+<table>
+<tr>
+<th>
+Equation
+</th>
+<th>
+Proposed Solution
+</th>
+</tr>
+<tr>
+<td>
+<ol start="14" type="1">
+<li>$ x + 8 = 15 $
+</td>
+<td>Does $x = 7$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="15" type="1">
+<li>$ x - 2 = 9 $
+</td>
+<td>Does $x = 7$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="16" type="1">
+<li>$ 3x = 24 $
+</td>
+<td>Does $x = 8$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="17" type="1">
+<li>$ 8x = 4 $
+</td>
+<td>Does $x =$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="18" type="1">
+<li>$ = 12 $
+</td>
+<td>Does $x = 6$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="19" type="1">
+<li>$ 25 - x = 19 $
+</td>
+<td>Does $x = 6$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="20" type="1">
+<li>$ = 6 $
+</td>
+<td>Does $x = 7$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="21" type="1">
+<li>$ x + = 2 $
+</td>
+<td>Does $x = 1$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="22" type="1">
+<li>$ 50x = 5 $
+</td>
+<td>Does $x = 10$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="23" type="1">
+<li>$ 12 = x + 8 $
+</td>
+<td>Does $x = 4$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="24" type="1">
+<li>$ 35 = 5x $
+</td>
+<td>Does $x = 30$?
+</td>
+</tr>
+<tr>
+<td>
+<ol start="25" type="1">
+<li>$ 1 = x - 9 $
+</td>
+<td>Does $x = 10$?
+</td>
+</tr>
+</table>
+<!-- table, from page 0 $l=0.058,t=0.406,r=0.940,b=0.829$, with ID f677425f-2318-49a7-b37d-2cfdb4bb9267 --></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol>
+<h2 id="page-footer">Page Footer</h2>
+<p>6WB6 - 146
+<!-- page_footer, from page 0 $l=0.450,t=0.921,r=0.547,b=0.934$, with ID 94948b5d-a9b7-4598-b054-45ac1ba54b33 --></p>
+<h3 id="page-footer-1">Page Footer</h3>
+<p>©2017 University of Utah Middle School Math Project in partnership
+with the Utah State Office of Education. Licensed under Creative
+Commons, cc-by.
+<!-- page_footer, from page 0 $l=0.599,t=0.924,r=0.907,b=0.941$, with ID 69f16758-0a61-48d2-9365-a3f6a5018d25 --></p>
+<h2 id="description-of-figure">Description of Figure</h2>
+<p>The image appears to be a simplified icon or logo, likely
+representing a graph or chart. It features a black square with rounded
+corners. Inside the square, there is a white area containing a series of
+vertical bars of varying heights, resembling a bar chart or histogram.
+The bars are aligned next to each other, with the tallest bars towards
+the center and shorter bars on the sides, creating a symmetrical
+pattern. There are no numerical values, labels, or additional text
+present in the image. The overall design is minimalistic, focusing on
+the visual representation of data through the bar heights.
+<!-- figure, from page 1 $l=0.711,t=0.044,r=0.753,b=0.074$, with ID be559df7-3f00-4e3e-ad31-2d411a6c9201 --></p>
+<h2 id="directions-1">Directions</h2>
+<p>Solve the following equations using mental math. Justify your answer.
+<!-- text, from page 1 $l=0.058,t=0.063,r=0.705,b=0.078$, with ID 65d2fff7-8daf-41bd-ba55-ad5abe3c64c5 --></p>
+<h2 id="equations">Equations</h2>
+<ul>
+<li><span class="math inline">$x + 10 = 14$</span></li>
+<li><span class="math inline">$x - 5 = 3$</span></li>
+<li><span class="math inline">$4x = 20$</span>
+<!-- text, from page 1 $l=0.066,t=0.098,r=0.754,b=0.110$, with ID b0af73a7-863a-472b-80ae-248a12bfba22 --></li>
+</ul>
+<h2 id="equations-1">Equations</h2>
+<ol type="1">
+<li><p>$ = 3 $</p></li>
+<li><p>$ = 5 $</p></li>
+<li><p>$ 7 + x = 15 $
+<!-- text, from page 1 $l=0.066,t=0.194,r=0.785,b=0.220$, with ID 3c396851-5e18-4a84-8881-6bb74c0757d9 --></p></li>
+</ol>
+<h2 id="equations-2">Equations</h2>
+<ul>
+<li><span class="math inline">$9 - x = 8$</span></li>
+<li><span class="math inline">$49 = 7x$</span></li>
+<li><span class="math inline">$3 = \frac{x}{5}$</span>
+<!-- text, from page 1 $l=0.066,t=0.293,r=0.730,b=0.316$, with ID 519eea24-bcfb-4a2a-92af-f212b0975603 --></li>
+</ul>
+<h2 id="equations-3">Equations</h2>
+<ol type="1">
+<li><p><span class="math inline">\$x + \frac{1}{2} =
+\frac{5}{2}\$</span></p></li>
+<li><p><span class="math inline">$0.1x = 10$</span></p></li>
+<li><p><span class="math inline">$\frac{1}{4}x = 6$</span>
+<!-- text, from page 1 $l=0.066,t=0.391,r=0.744,b=0.417$, with ID f926790e-92ee-4318-8ce8-7ec0ed15fbdb --></p></li>
+</ol>
+<h2 id="spiral-review">Spiral Review
+<!-- text, from page 1 $l=0.434,t=0.509,r=0.565,b=0.526$, with ID bed227d7-3423-4a27-8932-1488e4e5c616 --></h2>
+<ol type="1">
+<li>Simplify the expression. If the expression is already simplified,
+write “already simplified”
+<!-- text, from page 1 $l=0.059,t=0.547,r=0.796,b=0.562$, with ID 5d1412b5-f457-4679-b1c3-482abb50f68d --></li>
+</ol>
+<h2 id="equations-4">Equations</h2>
+<ol type="a">
+<li><p><span class="math inline">$m + m + m + m$</span></p></li>
+<li><p><span class="math inline">$4x + 5x + x$</span>
+<!-- text, from page 1 $l=0.095,t=0.566,r=0.669,b=0.577$, with ID 6edb626f-9484-48d6-8995-2ac020761c60 --></p></li>
+</ol>
+<table>
+<tr>
+<td>
+<ol start="3" type="a">
+<li><span class="math inline">$5x + 5y$</span>
+</td>
+<td>
+<ol start="4" type="a">
+<li><span class="math inline">$4x + 8 + x - 3$</span>
+</td>
+</tr>
+</table>
+<!-- text, from page 1 $l=0.096,t=0.617,r=0.691,b=0.632$, with ID 57dbe53d-7894-4202-b71c-8f2f4af59c8c --></li>
+</ol></li>
+</ol>
+<ol start="2" type="1">
+<li>Evaluate each expression for $ x = 5 $
+<!-- text, from page 1 $l=0.058,t=0.691,r=0.369,b=0.706$, with ID 3d087c87-b8d1-44d6-8f02-d0541f30c72a --></li>
+</ol>
+<div class="line-block">a. <span class="math inline">$3x$</span> | b.
+<span class="math inline">$3 + x$</span> |
+<!-- text, from page 1 $l=0.095,t=0.709,r=0.613,b=0.722$, with ID 73bd26af-f98b-4ef3-bb78-5c4570430ac7 --></div>
+<table>
+<tr>
+<td>
+<ol start="3" type="a">
+<li><span class="math inline">$x^3$</span>
+</td>
+<td>
+<ol start="4" type="a">
+<li><span class="math inline">$2x^3$</span>
+</td>
+</tr>
+</table>
+<!-- text, from page 1 $l=0.096,t=0.759,r=0.598,b=0.775$, with ID df60a3c4-d0b0-40d9-a5a4-0889a0033c93 --></li>
+</ol></li>
+</ol>
+<ol start="3" type="1">
+<li><p>I am thinking of a number. When I divide the number by 3, I get
+15. What is the number?
+<!-- text, from page 1 $l=0.058,t=0.818,r=0.790,b=0.834$, with ID 704925f2-d74b-49b0-823b-114e7707634d --></p></li>
+<li><p>After Mario paid $2.75 for school lunch, he had $1.25 left. How
+much money did Mario have before he paid for school lunch?
+<!-- text, from page 1 $l=0.056,t=0.870,r=0.939,b=0.901$, with ID c741bf37-b0ae-46c3-8944-ac0a144246de --></p></li>
+</ol>
+<h2 id="page-footer-2">Page Footer</h2>
+<p>6WB6 - 147
+<!-- page_footer, from page 1 $l=0.450,t=0.921,r=0.547,b=0.934$, with ID f458f67d-d454-4bb0-867e-7a06242072e0 --></p>
+<h3 id="page-footer-3">Page Footer</h3>
+<p>©2017 University of Utah Middle School Math Project in partnership
+with the Utah State Office of Education. Licensed under Creative
+Commons, cc-by.
+<!-- page_footer, from page 1 $l=0.599,t=0.924,r=0.907,b=0.941$, with ID d846de31-c64d-40c5-8c6a-c22150be5a36 --></p>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<title>Find, Fix, and Justify</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<style>
+/* Improved math styling */
+.math {
+  font-family: 'STIX Two Math', 'Latin Modern Math', serif;
+}
+mjx-container {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+.mjx-full-width {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Find, Fix, and Justify</h1>
+</header>
+
+<ol start="6" type="1">
+<li>Three copies of the same figure are shown below. Each square
+represents one square unit. There are many ways to find the area of this
+figure.
+<!-- text, from page 0 $l=0.086,t=0.046,r=0.901,b=0.080$, with ID 9a32dcab-56c5-4b74-bc04-bc492e1f8d20 --></li>
+</ol>
+<p><img alt="The image consists of three identical purple L-shaped figures, each
+placed on a separate grid. The grids are composed of small squares, and
+each figure is outlined in a darker purple border. The figures are
+labeled sequentially from left to right as “1”, “2”, and “3”." src="placeholder.png"/></p><h3 id="details">Details:</h3>
+<ul>
+<li><strong>Grid Layout</strong>: Each grid is a 10x10 square grid.</li>
+<li><strong>Figure Shape</strong>: Each L-shaped figure occupies a 7x7
+area on the grid.</li>
+<li><strong>Positioning</strong>:
+<ul>
+<li>The figures are positioned in the lower left corner of each
+grid.</li>
+<li>The vertical part of the “L” extends upwards, and the horizontal
+part extends to the right.</li>
+</ul></li>
+<li><strong>Labeling</strong>:
+<ul>
+<li>The top of each grid is labeled with numbers “1”, “2”, and “3”
+corresponding to each figure.</li>
+</ul></li>
+<li><strong>Color</strong>: The figures are filled with a light purple
+color, and the borders are a darker purple.</li>
+</ul>
+<p>The figures are identical in shape and size, with no variations
+between them.
+<!-- figure, from page 0 $l=0.060,t=0.083,r=0.921,b=0.309$, with ID 8ed2cffc-19b4-4d48-a514-77f2af72debd --></p>
+
+<ol type="a">
+<li><p>Split this figure into different non-overlapping regions in at
+least three ways. Show your work above.
+<!-- text, from page 0 $l=0.116,t=0.326,r=0.939,b=0.342$, with ID 171a442a-320b-408d-9b0b-a056d73078bf --></p></li>
+<li><p>For every figure that you split in part a write an expression
+that represents the area of the sum of the regions.
+<!-- text, from page 0 $l=0.116,t=0.397,r=0.930,b=0.429$, with ID d86d8c30-746f-4971-b12e-47aad374410c --></p></li>
+</ol>
+<h3 id="c.-find-the-total-area-of-the-figure.">c. Find the total area of
+the figure.
+<!-- text, from page 0 $l=0.116,t=0.501,r=0.395,b=0.517$, with ID 6d8f4e71-8ad5-4ad6-b916-d98065ae83e9 --></h3>
+<p>Gloria is painting a feature wall in her bedroom. The dimensions of
+the wall measure 14 feet by 11 feet. The gallon of paint that she
+purchased will cover 400 square feet. Does she have enough paint to do
+two coats on the wall? Justify your answer.
+<!-- text, from page 0 $l=0.088,t=0.607,r=0.933,b=0.655$, with ID 7ab5581e-b674-4bd0-aec0-ab7f56133d74 --></p>
+<p>Steven is designing a rectangular frame to go around a drawing that
+measures 11 inches by 8 inches. He has budgeted $15.00 to cover the cost
+of the material for the frame. He would like the frame to be 2 inches
+wide around the perimeter of the drawing. The diagram below shows the
+dimensions of the drawing and the frame. The material for the frame
+costs $0.20 per square inch. Will Steven have enough money to cover the
+cost of the frame?
+<!-- text, from page 0 $l=0.088,t=0.711,r=0.585,b=0.848$, with ID bfb9a42b-19e9-4987-89ad-9920ae30b9a9 --></p>
+<p><img alt="The image is a diagram of a rectangle with a surrounding border. The
+inner rectangle is labeled with dimensions, and the border is uniformly
+wide around the rectangle. Inner Rectangle Dimensions:
+
+Width: 11 inches
+Height: 8 inches
+
+Border Width:
+
+The border is 2 inches wide on all sides of the rectangle. The outer dimensions of the entire figure, including the border, can
+be calculated as follows: Outer Width: $11 , + 2 , + 2 , = 15 , $
+Outer Height: $8 , + 2 , + 2 , = 12 , $ The border is shaded differently from the inner rectangle, indicating
+a distinction between the two areas." src="placeholder.png"/></p><h2 id="page-footer">Page Footer</h2>
+<p>6WB4-9
+<!-- page_footer, from page 0 $l=0.460,t=0.913,r=0.537,b=0.924$, with ID 73646591-8d92-408c-90fa-6d5dc3238afe --></p>
+<h2 id="page-footer-1">Page Footer</h2>
+<p>©2017 University of Utah Middle School Math Project in partnership
+with the Utah State Board of Education. Licensed under Creative Commons,
+cc-by.
+<!-- page_footer, from page 0 $l=0.600,t=0.916,r=0.910,b=0.932$, with ID 248f2607-9ad8-4237-bdf1-b68738916df4 --></p>
+<h1 id="find-fix-and-justify">Find, Fix, and Justify</h1>
+<p><!-- title, from page 1 $l=0.116,t=0.043,r=0.338,b=0.075$, with ID 28bbb42b-51ed-43cf-8c04-e92b4b9ef3cb --></p>
+<p><img alt="The figure shows a problem related to calculating the area of a yard
+for laying grass sod. It includes a diagram of the yard, a calculation
+by Antonia, and a speech bubble with her explanation." src="placeholder.png"/></p><h3 id="diagram-details">Diagram Details</h3>
+<ul>
+<li>The yard is depicted as an L-shaped area.</li>
+<li>The dimensions of the yard are labeled:
+<ul>
+<li>The top horizontal section is 22 feet long.</li>
+<li>The left vertical section is 10 feet high.</li>
+<li>The bottom horizontal section is 15 feet long.</li>
+<li>The right vertical section is 25 feet high.</li>
+</ul></li>
+</ul>
+<h3 id="antonias-calculation">Antonia’s Calculation</h3>
+<p>Antonia has attempted to calculate the area of the yard by dividing
+it into two rectangles:</p>
+<ol type="1">
+<li><strong>First Rectangle</strong>:
+<ul>
+<li>Dimensions: 10 feet by 22 feet.</li>
+<li>Area Calculation: <span class="math inline">\$10 \times 22 =
+220\$</span> square feet.</li>
+</ul></li>
+<li><strong>Second Rectangle</strong>:
+<ul>
+<li>Dimensions: 25 feet by 15 feet.</li>
+<li>Area Calculation: <span class="math inline">\$25 \times 15 =
+375\$</span> square feet.</li>
+</ul></li>
+</ol>
+<ul>
+<li>Antonia’s Total Area Calculation:
+<ul>
+<li>She adds the areas of the two rectangles: <span class="math inline">$220 + 375 = 595$</span> square feet.</li>
+<li>Antonia concludes: “So I will need 595 square feet of grass.”</li>
+</ul></li>
+</ul>
+<h3 id="error-explanation">Error Explanation</h3>
+<p>Antonia’s mistake lies in the incorrect division of the yard into
+rectangles. The overlapping area or incorrect dimensions might have led
+to an incorrect total area calculation. The correct approach would
+involve ensuring the dimensions used for each rectangle accurately
+represent the yard’s layout without overlap or omission.</p>
+<h3 id="correct-area-calculation">Correct Area Calculation</h3>
+<p>To find the correct area, the yard should be divided into
+non-overlapping rectangles, ensuring all parts of the L-shape are
+covered without duplication. The correct dimensions and calculations
+need to be verified to find the accurate total area.
+<!-- figure, from page 1 $l=0.077,t=0.078,r=0.940,b=0.357$, with ID ea6fc461-07fa-47a8-b200-54083068a2b6 --></p>
+<h2 id="directions">Directions</h2>
+<p>For numbers 9-12, find the total area of each figure by decomposing
+it into non-overlapping regions. Assume that all angles that appear to
+be right angles are right angles.
+<!-- text, from page 1 $l=0.058,t=0.443,r=0.934,b=0.475$, with ID 9b08c7e9-f3dc-4cba-9ca5-ef4bbc8543e6 --></p>
+<h3 id="description-of-the-document-crop">Description of the Document
+Crop</h3>
+<p>The image contains four distinct geometric shapes, each labeled with
+a number and dimensions. These shapes are likely part of a problem set
+involving area or perimeter calculations. Below is a detailed
+description of each shape:</p>
+<h4 id="shape-9">Shape 9</h4>
+<ul>
+<li><strong>Color</strong>: Dark blue</li>
+<li><strong>Dimensions</strong>:
+<ul>
+<li>Vertical section: 12 ft wide, 18 ft tall</li>
+<li>Horizontal section: 10 ft wide, 2 ft tall</li>
+<li>Additional vertical section: 12 ft tall, 14 ft wide</li>
+</ul></li>
+</ul>
+<h4 id="shape-10">Shape 10</h4>
+<ul>
+<li><strong>Color</strong>: Orange</li>
+<li><strong>Dimensions</strong>:
+<ul>
+<li>Main horizontal section: 112 in wide, 20 in tall</li>
+<li>Vertical section: 22 in wide, 44 in tall</li>
+</ul></li>
+</ul>
+<h4 id="shape-11">Shape 11</h4>
+<ul>
+<li><strong>Color</strong>: Pink</li>
+<li><strong>Dimensions</strong>:
+<ul>
+<li>Horizontal section: 9 units wide, 2 units tall</li>
+<li>Vertical section: 6 units tall, 2 units wide</li>
+<li>Additional horizontal section: 3 units wide, 2 units tall</li>
+</ul></li>
+</ul>
+<h4 id="shape-12">Shape 12</h4>
+<ul>
+<li><strong>Color</strong>: Green</li>
+<li><strong>Dimensions</strong>:
+<ul>
+<li>Vertical section: 9 yd wide, 20 yd tall</li>
+<li>Horizontal section: 16 yd wide, 10 yd tall</li>
+</ul></li>
+</ul>
+<p>Each shape is labeled with a number in the top left corner,
+indicating its position in a sequence or problem set. The dimensions are
+clearly marked on each segment of the shapes, suggesting that these are
+composite figures made up of rectangles.
+<!-- table, from page 1 $l=0.056,t=0.476,r=0.941,b=0.895$, with ID 076473b5-1426-4a8c-b748-df41c0b4441e --></p>
+<h2 id="page-footer-2">Page Footer</h2>
+<p>6WB4-10
+<!-- page_footer, from page 1 $l=0.455,t=0.913,r=0.542,b=0.924$, with ID dea03bc3-48e6-4b19-b496-ace9d470d5aa --></p>
+<h3 id="page-footer-3">Page Footer</h3>
+<p>©2017 University of Utah Middle School Math Project, in partnership
+with the Utah State Board of Education. Licensed under Creative Commons,
+cc-by.
+<!-- page_footer, from page 1 $l=0.600,t=0.916,r=0.910,b=0.932$, with ID 565f12ac-8357-43d7-8a5b-9a64994d0a60 --></p>
+</body>
+</html>
