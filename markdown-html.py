@@ -5,6 +5,7 @@ import io
 import os
 import json
 import re
+import html
 import pypandoc
 import panflute as pf
 from bs4 import BeautifulSoup
@@ -215,7 +216,10 @@ window.MathJax = {
     # This is the key fix for handling dollar signs in text
     html_content = protect_currency_in_paragraphs(html_content)
     
-    # 7. Add additional CSS for better math display
+    # 7. Fix broken img tags with HTML in alt text
+    html_content = fix_img_tags_with_html_in_alt(html_content)
+    
+    # 8. Add additional CSS for better math display
     math_css = '''
 <style>
 /* Improved math styling */
@@ -256,6 +260,31 @@ th {
     html_content = html_content.replace('</head>', f'{math_css}</head>')
     
     return html_content
+
+
+def fix_img_tags_with_html_in_alt(html_content):
+    """
+    Fix broken img tags where alt text contains HTML or MathML.
+    """
+    # Extract all img tags with their attributes
+    img_pattern = r'<img[^>]*?alt="(.*?)"[^>]*?>'
+    
+    def fix_img_tag(match):
+        # Get the original img tag
+        original_img = match.group(0)
+        # Get the alt text
+        alt_text = match.group(1)
+        
+        # Escape HTML in alt text
+        escaped_alt = html.escape(alt_text)
+        
+        # Replace the original alt text with the escaped version
+        return original_img.replace(f'alt="{alt_text}"', f'alt="{escaped_alt}"')
+    
+    # Fix all img tags
+    fixed_html = re.sub(img_pattern, fix_img_tag, html_content, flags=re.DOTALL)
+    
+    return fixed_html
 
 
 def protect_currency_in_paragraphs(html_content):
@@ -371,6 +400,7 @@ def process_markdown_file(input_md, output_html):
     - Figure description conversion to images with alt text
     - Proper math rendering
     - Currency symbol protection
+    - HTML escaping in alt text
     """
     print(f"Processing {input_md} to {output_html}")
     
