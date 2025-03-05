@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematical Expressions Using MathML</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        .example {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .note {
+            font-style: italic;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mathematical Expressions Using MathML</h1>
+    
+    <p>This document demonstrates mathematical expressions written using MathML instead of LaTeX.</p>
+    
+    <h2>Basic Arithmetic</h2>
+    
+    <div class="example">
+        <p>Addition: 2 + 3 = 5</p>
+        <math display="block">
+            <mrow>
+                <mn>2</mn>
+                <mo>+</mo>
+                <mn>3</mn>
+                <mo>=</mo>
+                <mn>5</mn>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="example">
+        <p>Subtraction: 7 - 4 = 3</p>
+        <math display="block">
+            <mrow>
+                <mn>7</mn>
+                <mo>-</mo>
+                <mn>4</mn>
+                <mo>=</mo>
+                <mn>3</mn>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="example">
+        <p>Multiplication: 5 × 6 = 30</p>
+        <math display="block">
+            <mrow>
+                <mn>5</mn>
+                <mo>×</mo>
+                <mn>6</mn>
+                <mo>=</mo>
+                <mn>30</mn>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="example">
+        <p>Division: 20 ÷ 4 = 5</p>
+        <math display="block">
+            <mrow>
+                <mn>20</mn>
+                <mo>÷</mo>
+                <mn>4</mn>
+                <mo>=</mo>
+                <mn>5</mn>
+            </mrow>
+        </math>
+    </div>
+    
+    <h2>Algebraic Expressions</h2>
+    
+    <div class="example">
+        <p>Quadratic formula: x = (-b ± √(b² - 4ac)) / (2a)</p>
+        <math display="block">
+            <mrow>
+                <mi>x</mi>
+                <mo>=</mo>
+                <mfrac>
+                    <mrow>
+                        <mo>-</mo>
+                        <mi>b</mi>
+                        <mo>±</mo>
+                        <msqrt>
+                            <mrow>
+                                <msup>
+                                    <mi>b</mi>
+                                    <mn>2</mn>
+                                </msup>
+                                <mo>-</mo>
+                                <mn>4</mn>
+                                <mi>a</mi>
+                                <mi>c</mi>
+                            </mrow>
+                        </msqrt>
+                    </mrow>
+                    <mrow>
+                        <mn>2</mn>
+                        <mi>a</mi>
+                    </mrow>
+                </mfrac>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="example">
+        <p>Binomial expansion: (a + b)² = a² + 2ab + b²</p>
+        <math display="block">
+            <mrow>
+                <msup>
+                    <mrow>
+                        <mo>(</mo>
+                        <mi>a</mi>
+                        <mo>+</mo>
+                        <mi>b</mi>
+                        <mo>)</mo>
+                    </mrow>
+                    <mn>2</mn>
+                </msup>
+                <mo>=</mo>
+                <msup>
+                    <mi>a</mi>
+                    <mn>2</mn>
+                </msup>
+                <mo>+</mo>
+                <mn>2</mn>
+                <mi>a</mi>
+                <mi>b</mi>
+                <mo>+</mo>
+                <msup>
+                    <mi>b</mi>
+                    <mn>2</mn>
+                </msup>
+            </mrow>
+        </math>
+    </div>
+    
+    <h2>Calculus</h2>
+    
+    <div class="example">
+        <p>Derivative of x²: d/dx(x²) = 2x</p>
+        <math display="block">
+            <mrow>
+                <mfrac>
+                    <mi>d</mi>
+                    <mrow>
+                        <mi>d</mi>
+                        <mi>x</mi>
+                    </mrow>
+                </mfrac>
+                <mo>(</mo>
+                <msup>
+                    <mi>x</mi>
+                    <mn>2</mn>
+                </msup>
+                <mo>)</mo>
+                <mo>=</mo>
+                <mn>2</mn>
+                <mi>x</mi>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="example">
+        <p>Integration: ∫x dx = x²/2 + C</p>
+        <math display="block">
+            <mrow>
+                <mo>∫</mo>
+                <mi>x</mi>
+                <mo>d</mo>
+                <mi>x</mi>
+                <mo>=</mo>
+                <mfrac>
+                    <msup>
+                        <mi>x</mi>
+                        <mn>2</mn>
+                    </msup>
+                    <mn>2</mn>
+                </mfrac>
+                <mo>+</mo>
+                <mi>C</mi>
+            </mrow>
+        </math>
+    </div>
+    
+    <h2>Trigonometry</h2>
+    
+    <div class="example">
+        <p>Pythagorean identity: sin²(θ) + cos²(θ) = 1</p>
+        <math display="block">
+            <mrow>
+                <msup>
+                    <mrow>
+                        <mi>sin</mi>
+                        <mo>⁡</mo>
+                        <mrow>
+                            <mo>(</mo>
+                            <mi>θ</mi>
+                            <mo>)</mo>
+                        </mrow>
+                    </mrow>
+                    <mn>2</mn>
+                </msup>
+                <mo>+</mo>
+                <msup>
+                    <mrow>
+                        <mi>cos</mi>
+                        <mo>⁡</mo>
+                        <mrow>
+                            <mo>(</mo>
+                            <mi>θ</mi>
+                            <mo>)</mo>
+                        </mrow>
+                    </mrow>
+                    <mn>2</mn>
+                </msup>
+                <mo>=</mo>
+                <mn>1</mn>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="example">
+        <p>Double angle formula: sin(2θ) = 2sin(θ)cos(θ)</p>
+        <math display="block">
+            <mrow>
+                <mi>sin</mi>
+                <mo>⁡</mo>
+                <mrow>
+                    <mo>(</mo>
+                    <mn>2</mn>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                </mrow>
+                <mo>=</mo>
+                <mn>2</mn>
+                <mi>sin</mi>
+                <mo>⁡</mo>
+                <mrow>
+                    <mo>(</mo>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                </mrow>
+                <mi>cos</mi>
+                <mo>⁡</mo>
+                <mrow>
+                    <mo>(</mo>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                </mrow>
+            </mrow>
+        </math>
+    </div>
+    
+    <h2>Linear Algebra</h2>
+    
+    <div class="example">
+        <p>Matrix multiplication:</p>
+        <math display="block">
+            <mrow>
+                <mo>[</mo>
+                <mtable>
+                    <mtr>
+                        <mtd><mi>a</mi></mtd>
+                        <mtd><mi>b</mi></mtd>
+                    </mtr>
+                    <mtr>
+                        <mtd><mi>c</mi></mtd>
+                        <mtd><mi>d</mi></mtd>
+                    </mtr>
+                </mtable>
+                <mo>]</mo>
+                <mo>×</mo>
+                <mo>[</mo>
+                <mtable>
+                    <mtr>
+                        <mtd><mi>e</mi></mtd>
+                        <mtd><mi>f</mi></mtd>
+                    </mtr>
+                    <mtr>
+                        <mtd><mi>g</mi></mtd>
+                        <mtd><mi>h</mi></mtd>
+                    </mtr>
+                </mtable>
+                <mo>]</mo>
+                <mo>=</mo>
+                <mo>[</mo>
+                <mtable>
+                    <mtr>
+                        <mtd><mi>a</mi><mi>e</mi><mo>+</mo><mi>b</mi><mi>g</mi></mtd>
+                        <mtd><mi>a</mi><mi>f</mi><mo>+</mo><mi>b</mi><mi>h</mi></mtd>
+                    </mtr>
+                    <mtr>
+                        <mtd><mi>c</mi><mi>e</mi><mo>+</mo><mi>d</mi><mi>g</mi></mtd>
+                        <mtd><mi>c</mi><mi>f</mi><mo>+</mo><mi>d</mi><mi>h</mi></mtd>
+                    </mtr>
+                </mtable>
+                <mo>]</mo>
+            </mrow>
+        </math>
+    </div>
+    
+    <h2>Statistics and Probability</h2>
+    
+    <div class="example">
+        <p>Normal distribution probability density function:</p>
+        <math display="block">
+            <mrow>
+                <mi>f</mi>
+                <mo>(</mo>
+                <mi>x</mi>
+                <mo>)</mo>
+                <mo>=</mo>
+                <mfrac>
+                    <mn>1</mn>
+                    <mrow>
+                        <mi>σ</mi>
+                        <msqrt>
+                            <mrow>
+                                <mn>2</mn>
+                                <mi>π</mi>
+                            </mrow>
+                        </msqrt>
+                    </mrow>
+                </mfrac>
+                <msup>
+                    <mi>e</mi>
+                    <mrow>
+                        <mo>-</mo>
+                        <mfrac>
+                            <mrow>
+                                <msup>
+                                    <mrow>
+                                        <mo>(</mo>
+                                        <mi>x</mi>
+                                        <mo>-</mo>
+                                        <mi>μ</mi>
+                                        <mo>)</mo>
+                                    </mrow>
+                                    <mn>2</mn>
+                                </msup>
+                            </mrow>
+                            <mrow>
+                                <mn>2</mn>
+                                <msup>
+                                    <mi>σ</mi>
+                                    <mn>2</mn>
+                                </msup>
+                            </mrow>
+                        </mfrac>
+                    </mrow>
+                </msup>
+            </mrow>
+        </math>
+    </div>
+    
+    <div class="note">
+        <p>Note: This document uses MathML for all mathematical expressions instead of LaTeX. MathML is a markup language specifically designed for displaying mathematical notations on the web and is natively supported by many modern browsers.</p>
+    </div>
+</body>
+</html>
