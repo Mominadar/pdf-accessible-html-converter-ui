@@ -1,0 +1,499 @@
+{
+  "data": {
+    "markdown": "## Text\n\n13. You could have created an equation to represent many of the problems on the previous page. For example, in #2, you were asked: <!-- text, from page 0 (l=0.060,t=0.047,r=0.922,b=0.080), with ID 290c6d24-933c-4cce-9949-b8e51ade6760 -->\n\n## Detailed Description\n\nThe image is a figure explaining how to solve the equation $x + 5 = 7$.\n\n### Text Explanation\n\n- The text at the top of the figure reads:\n  - \"What value for x makes the expression x + 5 equal to 7? In other words, when does the expression x + 5 equal 7? An **equation** is formed by setting two expressions equal to each other.\"\n\n### Equation Breakdown\n\n- The equation is presented as:\n  - $x + 5 = 7$\n  - This is broken down into two parts:\n    - **Expression 1**: $x + 5$\n    - **Expression 2**: $7$\n\n### Visual Elements\n\n- There is a yellow arrow pointing from the equal sign ($=$) with the label \"is equal to.\"\n- Underneath the expressions, there are labels:\n  - \"Expression 1\" under $x + 5$\n  - \"Expression 2\" under $7$\n\nThis figure is designed to visually explain the concept of an equation by showing how two expressions are set equal to each other. <!-- figure, from page 0 (l=0.086,t=0.099,r=0.915,b=0.281), with ID cdbb602b-166e-4098-8e04-4cc4a03cffee -->\n\nA **solution** to an equation is a number that **makes the equation true** when substituted for the unknown. Another way to think of this is to ask the question, \u201cFor what value of $x$ does the expression $x + 5$ evaluate to 7?\u201d <!-- text, from page 0 (l=0.058,t=0.323,r=0.929,b=0.354), with ID 78d9834f-76cb-4ba6-a37c-190d90c107a1 -->\n\n## Directions\n\nDetermine whether the given number is the solution to the equation given. Justify your answer. <!-- text, from page 0 (l=0.058,t=0.374,r=0.900,b=0.389), with ID d5b82105-064b-4c44-bdbf-cf06c570a6c1 -->\n\n## Table of Equations and Solutions\n\n<table>\n  <tr>\n    <td>14. $x + 8 = 15$<br>Does $x = 7$?</td>\n    <td>15. $x - 2 = 9$<br>Does $x = 7$?</td>\n    <td>16. $3x = 24$<br>Does $x = 8$?</td>\n  </tr>\n  <tr>\n    <td>17. $8x = 4$<br>Does $x = \\frac{1}{2}$?</td>\n    <td>18. $\\frac{x}{2} = 12$<br>Does $x = 6$?</td>\n    <td>19. $25 - x = 19$<br>Does $x = 6$?</td>\n  </tr>\n  <tr>\n    <td>20. $\\frac{42}{x} = 6$<br>Does $x = 7$?</td>\n    <td>21. $x + \\frac{2}{3} = 2 \\frac{1}{6}$<br>Does $x = 1 \\frac{1}{2}$?</td>\n    <td>22. $50x = 5$<br>Does $x = 10$?</td>\n  </tr>\n  <tr>\n    <td>23. $12 = x + 8$<br>Does $x = 4$?</td>\n    <td>24. $35 = 5x$<br>Does $x = 30$?</td>\n    <td>25. $1 = x - 9$<br>Does $x = 10$?</td>\n  </tr>\n</table> <!-- table, from page 0 (l=0.058,t=0.406,r=0.940,b=0.829), with ID 96c14d36-6e5b-4720-ab59-9f00bdc0473b -->\n\n## Page Footer\n\n6WB6 - 146 <!-- page_footer, from page 0 (l=0.450,t=0.921,r=0.547,b=0.934), with ID 78ab1c37-10ec-49b2-9d6a-c05dce2d5a84 -->\n\n### Page Footer\n\n\u00a92017 University of Utah Middle School Math Project in partnership with the Utah State Office of Education. Licensed under Creative Commons, cc-by. <!-- page_footer, from page 0 (l=0.599,t=0.924,r=0.907,b=0.941), with ID 71ff45db-579d-44d3-be40-220476f3b7fd -->\n\n## Description\n\nThe image is a black and white icon resembling a bar chart or histogram. It features a series of vertical bars of varying heights, arranged side by side. The bars are enclosed within a rounded square border. The background is black, and the bars are white, creating a high-contrast visual. There are no labels, numbers, or additional text present in the image. The icon likely represents data visualization or analytics. <!-- figure, from page 1 (l=0.711,t=0.044,r=0.753,b=0.074), with ID 72a29a04-6337-4f5b-be6a-675c1a23a30d -->\n\n## Directions\n\nSolve the following equations using mental math. Justify your answer. <!-- text, from page 1 (l=0.058,t=0.063,r=0.705,b=0.078), with ID e158a44b-b870-427b-a304-387f157f4219 -->\n\n## Equations\n\n1. $x + 10 = 14$\n\n2. $x - 5 = 3$\n\n3. $4x = 20$ <!-- text, from page 1 (l=0.066,t=0.099,r=0.200,b=0.110); page 1 (l=0.360,t=0.098,r=0.471,b=0.110); page 1 (l=0.654,t=0.098,r=0.754,b=0.110), with ID 264e3351-a5b9-4471-9b4f-17834eb7604c -->\n\n## Equations\n\n1. $ \\frac{x}{7} = 3 $\n\n2. $ \\frac{40}{x} = 5 $\n\n3. $ 7 + x = 15 $ <!-- text, from page 1 (l=0.066,t=0.195,r=0.141,b=0.218); page 1 (l=0.361,t=0.194,r=0.443,b=0.220); page 1 (l=0.655,t=0.196,r=0.785,b=0.209), with ID ee32cddb-a704-4025-a76b-ca3f0011f94b -->\n\n## Equations\n\n1. $9 - x = 8$\n\n2. $49 = 7x$\n\n3. $3 = \\frac{x}{5}$ <!-- text, from page 1 (l=0.066,t=0.295,r=0.179,b=0.307); page 1 (l=0.361,t=0.295,r=0.460,b=0.307); page 1 (l=0.654,t=0.293,r=0.730,b=0.316), with ID 6cadffc9-7c19-46c4-b205-794cc8fe69f1 -->\n\n## Equations\n\n1. $x + \\frac{1}{2} = \\frac{5}{2}$\n\n2. $0.1x = 10$\n\n3. $\\frac{1}{4}x = 6$ <!-- text, from page 1 (l=0.066,t=0.391,r=0.174,b=0.417); page 1 (l=0.361,t=0.393,r=0.474,b=0.406); page 1 (l=0.655,t=0.392,r=0.744,b=0.416), with ID f02fe15c-899b-438b-8c5e-154cd6841436 -->\n\n## Spiral Review <!-- text, from page 1 (l=0.434,t=0.509,r=0.565,b=0.526), with ID cda60d55-42c4-40bd-9837-9b9e20fa61e8 -->\n\n1. Simplify the expression. If the expression is already simplified, write \u201calready simplified\u201d <!-- text, from page 1 (l=0.059,t=0.547,r=0.796,b=0.562), with ID 8146d3a1-3a97-462f-b80b-6f29c3ec92a4 -->\n\n## Equations\n\na. $m + m + m + m$\n\nb. $4x + 5x + x$ <!-- text, from page 1 (l=0.095,t=0.566,r=0.263,b=0.577); page 1 (l=0.536,t=0.566,r=0.669,b=0.577), with ID 99ec071f-45bc-486f-8885-9a325cd0c4be -->\n\n## Equations\n\n- c. $5x + 5y$\n- d. $4x + 8 + x - 3$ <!-- text, from page 1 (l=0.096,t=0.617,r=0.194,b=0.632); page 1 (l=0.537,t=0.617,r=0.691,b=0.629), with ID ad3b77fc-24e2-4f8f-ac68-b8f3223d2ee6 -->\n\n## 2. Evaluate each expression for \\( x = 5 \\) <!-- text, from page 1 (l=0.058,t=0.691,r=0.369,b=0.706), with ID b11a34c0-13b5-4ee9-95d0-f4c6d36819b5 -->\n\n## Options\n\na. $3x$\n\nb. $3 + x$ <!-- text, from page 1 (l=0.095,t=0.710,r=0.147,b=0.722); page 1 (l=0.536,t=0.709,r=0.613,b=0.722), with ID 83522362-c6e1-4a29-beac-075d7c7b90f4 -->\n\n## Options\n\nc. $x^3$\n\nd. $2x^3$ <!-- text, from page 1 (l=0.096,t=0.759,r=0.146,b=0.775); page 1 (l=0.537,t=0.760,r=0.598,b=0.774), with ID 138bee35-0c0f-4c35-93a4-4e78e73210b4 -->\n\n3. I am thinking of a number. When I divide the number by 3, I get 15. What is the number? <!-- text, from page 1 (l=0.058,t=0.818,r=0.790,b=0.834), with ID f2902a6a-a537-4c8d-ab59-74258db93bf0 -->\n\n4. After Mario paid $2.75 for school lunch, he had $1.25 left. How much money did Mario have before he paid for school lunch? <!-- text, from page 1 (l=0.056,t=0.870,r=0.939,b=0.901), with ID eeb39fd5-e5fa-4ef4-b2e2-8e0fdc710d86 -->\n\n## Page Footer\n\n6WB6 - 147 <!-- page_footer, from page 1 (l=0.450,t=0.921,r=0.547,b=0.934), with ID 704f0128-bb92-442f-8b69-2f0d27877367 -->\n\n## Page Footer\n\n\u00a92017 University of Utah Middle School Math Project in partnership with the Utah State Office of Education. Licensed under Creative Commons, cc-by. <!-- page_footer, from page 1 (l=0.599,t=0.924,r=0.907,b=0.941), with ID 0b3869a4-b18d-4210-a00a-8ebd77935a8b -->",
+    "chunks": [
+      {
+        "text": "## Text\n\n13. You could have created an equation to represent many of the problems on the previous page. For example, in #2, you were asked:",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.06,
+              "t": 0.04732954545454546,
+              "r": 0.9225,
+              "b": 0.08017045454545454
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "290c6d24-933c-4cce-9949-b8e51ade6760"
+      },
+      {
+        "text": "## Detailed Description\n\nThe image is a figure explaining how to solve the equation $x + 5 = 7$.\n\n### Text Explanation\n\n- The text at the top of the figure reads:\n  - \"What value for x makes the expression x + 5 equal to 7? In other words, when does the expression x + 5 equal 7? An **equation** is formed by setting two expressions equal to each other.\"\n\n### Equation Breakdown\n\n- The equation is presented as:\n  - $x + 5 = 7$\n  - This is broken down into two parts:\n    - **Expression 1**: $x + 5$\n    - **Expression 2**: $7$\n\n### Visual Elements\n\n- There is a yellow arrow pointing from the equal sign ($=$) with the label \"is equal to.\"\n- Underneath the expressions, there are labels:\n  - \"Expression 1\" under $x + 5$\n  - \"Expression 2\" under $7$\n\nThis figure is designed to visually explain the concept of an equation by showing how two expressions are set equal to each other.",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.08625000000000001,
+              "t": 0.09948863636363636,
+              "r": 0.915,
+              "b": 0.28107954545454544
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "figure",
+        "chunk_id": "cdbb602b-166e-4098-8e04-4cc4a03cffee"
+      },
+      {
+        "text": "A **solution** to an equation is a number that **makes the equation true** when substituted for the unknown. Another way to think of this is to ask the question, \u201cFor what value of $x$ does the expression $x + 5$ evaluate to 7?\u201d",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.0575,
+              "t": 0.3226136363636364,
+              "r": 0.92875,
+              "b": 0.35448863636363637
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "78d9834f-76cb-4ba6-a37c-190d90c107a1"
+      },
+      {
+        "text": "## Directions\n\nDetermine whether the given number is the solution to the equation given. Justify your answer.",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.0575,
+              "t": 0.3738068181818182,
+              "r": 0.9,
+              "b": 0.38926136363636366
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "d5b82105-064b-4c44-bdbf-cf06c570a6c1"
+      },
+      {
+        "text": "## Table of Equations and Solutions\n\n<table>\n  <tr>\n    <td>14. $x + 8 = 15$<br>Does $x = 7$?</td>\n    <td>15. $x - 2 = 9$<br>Does $x = 7$?</td>\n    <td>16. $3x = 24$<br>Does $x = 8$?</td>\n  </tr>\n  <tr>\n    <td>17. $8x = 4$<br>Does $x = \\frac{1}{2}$?</td>\n    <td>18. $\\frac{x}{2} = 12$<br>Does $x = 6$?</td>\n    <td>19. $25 - x = 19$<br>Does $x = 6$?</td>\n  </tr>\n  <tr>\n    <td>20. $\\frac{42}{x} = 6$<br>Does $x = 7$?</td>\n    <td>21. $x + \\frac{2}{3} = 2 \\frac{1}{6}$<br>Does $x = 1 \\frac{1}{2}$?</td>\n    <td>22. $50x = 5$<br>Does $x = 10$?</td>\n  </tr>\n  <tr>\n    <td>23. $12 = x + 8$<br>Does $x = 4$?</td>\n    <td>24. $35 = 5x$<br>Does $x = 30$?</td>\n    <td>25. $1 = x - 9$<br>Does $x = 10$?</td>\n  </tr>\n</table>",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.0575,
+              "t": 0.4056818181818182,
+              "r": 0.9400000000000001,
+              "b": 0.8287500000000001
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "table",
+        "chunk_id": "96c14d36-6e5b-4720-ab59-9f00bdc0473b"
+      },
+      {
+        "text": "## Page Footer\n\n6WB6 - 146",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.45,
+              "t": 0.9214772727272728,
+              "r": 0.5475,
+              "b": 0.934034090909091
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "page_footer",
+        "chunk_id": "78ab1c37-10ec-49b2-9d6a-c05dce2d5a84"
+      },
+      {
+        "text": "### Page Footer\n\n\u00a92017 University of Utah Middle School Math Project in partnership with the Utah State Office of Education. Licensed under Creative Commons, cc-by.",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.59875,
+              "t": 0.924375,
+              "r": 0.9075,
+              "b": 0.9407954545454545
+            },
+            "page": 0
+          }
+        ],
+        "chunk_type": "page_footer",
+        "chunk_id": "71ff45db-579d-44d3-be40-220476f3b7fd"
+      },
+      {
+        "text": "## Description\n\nThe image is a black and white icon resembling a bar chart or histogram. It features a series of vertical bars of varying heights, arranged side by side. The bars are enclosed within a rounded square border. The background is black, and the bars are white, creating a high-contrast visual. There are no labels, numbers, or additional text present in the image. The icon likely represents data visualization or analytics.",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.71125,
+              "t": 0.04443181818181818,
+              "r": 0.7525000000000001,
+              "b": 0.07437500000000001
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "figure",
+        "chunk_id": "72a29a04-6337-4f5b-be6a-675c1a23a30d"
+      },
+      {
+        "text": "## Directions\n\nSolve the following equations using mental math. Justify your answer.",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.0575,
+              "t": 0.0627840909090909,
+              "r": 0.705,
+              "b": 0.07823863636363637
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "e158a44b-b870-427b-a304-387f157f4219"
+      },
+      {
+        "text": "## Equations\n\n1. $x + 10 = 14$\n\n2. $x - 5 = 3$\n\n3. $4x = 20$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.06625,
+              "t": 0.09852272727272728,
+              "r": 0.2,
+              "b": 0.11011363636363636
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.36,
+              "t": 0.09755681818181819,
+              "r": 0.47125,
+              "b": 0.11011363636363636
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.65375,
+              "t": 0.09755681818181819,
+              "r": 0.75375,
+              "b": 0.11011363636363636
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "264e3351-a5b9-4471-9b4f-17834eb7604c"
+      },
+      {
+        "text": "## Equations\n\n1. $ \\frac{x}{7} = 3 $\n\n2. $ \\frac{40}{x} = 5 $\n\n3. $ 7 + x = 15 $",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.06625,
+              "t": 0.19511363636363638,
+              "r": 0.14125000000000001,
+              "b": 0.21829545454545454
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.36125,
+              "t": 0.19414772727272728,
+              "r": 0.44250000000000006,
+              "b": 0.22022727272727272
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.655,
+              "t": 0.19607954545454545,
+              "r": 0.785,
+              "b": 0.20863636363636365
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "ee32cddb-a704-4025-a76b-ca3f0011f94b"
+      },
+      {
+        "text": "## Equations\n\n1. $9 - x = 8$\n\n2. $49 = 7x$\n\n3. $3 = \\frac{x}{5}$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.06625,
+              "t": 0.29460227272727274,
+              "r": 0.17875000000000002,
+              "b": 0.30715909090909094
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.36125,
+              "t": 0.29460227272727274,
+              "r": 0.46,
+              "b": 0.30715909090909094
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.65375,
+              "t": 0.29267045454545454,
+              "r": 0.7300000000000001,
+              "b": 0.31585227272727273
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "6cadffc9-7c19-46c4-b205-794cc8fe69f1"
+      },
+      {
+        "text": "## Equations\n\n1. $x + \\frac{1}{2} = \\frac{5}{2}$\n\n2. $0.1x = 10$\n\n3. $\\frac{1}{4}x = 6$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.06625,
+              "t": 0.39119318181818186,
+              "r": 0.17375,
+              "b": 0.4172727272727273
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.36125,
+              "t": 0.39312500000000006,
+              "r": 0.47375000000000006,
+              "b": 0.4056818181818182
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.655,
+              "t": 0.3921590909090909,
+              "r": 0.74375,
+              "b": 0.4163068181818182
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "f02fe15c-899b-438b-8c5e-154cd6841436"
+      },
+      {
+        "text": "## Spiral Review",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.43375,
+              "t": 0.509034090909091,
+              "r": 0.5650000000000001,
+              "b": 0.5264204545454545
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "cda60d55-42c4-40bd-9837-9b9e20fa61e8"
+      },
+      {
+        "text": "1. Simplify the expression. If the expression is already simplified, write \u201calready simplified\u201d",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.058750000000000004,
+              "t": 0.5467045454545455,
+              "r": 0.79625,
+              "b": 0.5621590909090909
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "8146d3a1-3a97-462f-b80b-6f29c3ec92a4"
+      },
+      {
+        "text": "## Equations\n\na. $m + m + m + m$\n\nb. $4x + 5x + x$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.09500000000000001,
+              "t": 0.5660227272727273,
+              "r": 0.2625,
+              "b": 0.5766477272727273
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.53625,
+              "t": 0.5660227272727273,
+              "r": 0.6687500000000001,
+              "b": 0.5766477272727273
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "99ec071f-45bc-486f-8885-9a325cd0c4be"
+      },
+      {
+        "text": "## Equations\n\n- c. $5x + 5y$\n- d. $4x + 8 + x - 3$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.09625,
+              "t": 0.6172159090909091,
+              "r": 0.19375,
+              "b": 0.6317045454545455
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.5375,
+              "t": 0.6172159090909091,
+              "r": 0.69125,
+              "b": 0.6288068181818182
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "ad3b77fc-24e2-4f8f-ac68-b8f3223d2ee6"
+      },
+      {
+        "text": "## 2. Evaluate each expression for \\( x = 5 \\)",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.0575,
+              "t": 0.690625,
+              "r": 0.36875,
+              "b": 0.7060795454545454
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "b11a34c0-13b5-4ee9-95d0-f4c6d36819b5"
+      },
+      {
+        "text": "## Options\n\na. $3x$\n\nb. $3 + x$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.09500000000000001,
+              "t": 0.7099431818181818,
+              "r": 0.1475,
+              "b": 0.7215340909090909
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.53625,
+              "t": 0.7089772727272727,
+              "r": 0.6125,
+              "b": 0.7215340909090909
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "83522362-c6e1-4a29-beac-075d7c7b90f4"
+      },
+      {
+        "text": "## Options\n\nc. $x^3$\n\nd. $2x^3$",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.09625,
+              "t": 0.7592045454545455,
+              "r": 0.14625,
+              "b": 0.774659090909091
+            },
+            "page": 1
+          },
+          {
+            "box": {
+              "l": 0.5375,
+              "t": 0.7601704545454545,
+              "r": 0.5975,
+              "b": 0.7736931818181818
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "138bee35-0c0f-4c35-93a4-4e78e73210b4"
+      },
+      {
+        "text": "3. I am thinking of a number. When I divide the number by 3, I get 15. What is the number?",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.0575,
+              "t": 0.8181250000000001,
+              "r": 0.79,
+              "b": 0.8335795454545455
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "f2902a6a-a537-4c8d-ab59-74258db93bf0"
+      },
+      {
+        "text": "4. After Mario paid $2.75 for school lunch, he had $1.25 left. How much money did Mario have before he paid for school lunch?",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.05625,
+              "t": 0.870284090909091,
+              "r": 0.93875,
+              "b": 0.9011931818181819
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "text",
+        "chunk_id": "eeb39fd5-e5fa-4ef4-b2e2-8e0fdc710d86"
+      },
+      {
+        "text": "## Page Footer\n\n6WB6 - 147",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.45,
+              "t": 0.9214772727272728,
+              "r": 0.5475,
+              "b": 0.934034090909091
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "page_footer",
+        "chunk_id": "704f0128-bb92-442f-8b69-2f0d27877367"
+      },
+      {
+        "text": "## Page Footer\n\n\u00a92017 University of Utah Middle School Math Project in partnership with the Utah State Office of Education. Licensed under Creative Commons, cc-by.",
+        "grounding": [
+          {
+            "box": {
+              "l": 0.59875,
+              "t": 0.924375,
+              "r": 0.9075,
+              "b": 0.9407954545454545
+            },
+            "page": 1
+          }
+        ],
+        "chunk_type": "page_footer",
+        "chunk_id": "0b3869a4-b18d-4210-a00a-8ebd77935a8b"
+      }
+    ]
+  }
+}

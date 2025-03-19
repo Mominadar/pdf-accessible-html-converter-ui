@@ -78,10 +78,10 @@ def main():
     
     try:
         # Use the sample URL directly from Mistral's documentation
-        # sample_url = "https://arxiv.org/pdf/2201.04234"
+        sample_url = "https://arxiv.org/pdf/2201.04234"
         # sample_url = "https://pdfobject.com/pdf/sample.pdf"
         # sample_url = "https://elasticsounds.github.io/pdf-public/c4611_sample_explain.pdf"
-        sample_url = "https://elasticsounds.github.io/pdf-public/toolkit_unicef_a.pdf"
+        # sample_url = "https://elasticsounds.github.io/pdf-public/toolkit_unicef_a.pdf"
         print(f"Processing Arxiv URL: {sample_url}")
         print("Starting OCR processing...")
         
