@@ -9,6 +9,10 @@ The conversion process happens in two steps:
 1. **PDF to Markdown conversion** (using Agentic Document Extraction API)
 2. **Markdown to Accessible HTML conversion** (with MathJax support and image descriptions)
 
+## Alternative Method
+
+There is a set of alternative scripts that use Mistral's API to convert from PDF -> JSON - > Markdown -> HTML. The Mistral API is $1 per 1000 pages, however it does not seem to support generating image descriptions out of the box. More work will be needed to prepare these scripts to handle content like the Agentic Document Extraction API.
+
 ## Prerequisites
 
 - Python 3.7 or later
