@@ -165,3 +165,7 @@ If mathematical expressions aren't rendering correctly:
 ---
 
 Feel free to contribute to this project by submitting issues or pull requests!
+
+# Alternative Approach with Mistral
+## Setting up the Mistral API Key
+
