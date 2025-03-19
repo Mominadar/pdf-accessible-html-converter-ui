@@ -1,0 +1,48 @@
+{
+  "pages": [
+    {
+      "index": 0,
+      "markdown": "# $\\stackrel{\\rightharpoonup}{\\infty}$ \n\n## ACCELIO.\n\n## PDF BOOKMARK SAMPLE\n\n| Sample Date: | May 2001 |\n| :-- | :-- |\n| Prepared by: | Accelio Present Applied Technology |\n| Created and Tested Using: | - Accelio Present Central 5.4 |\n|  | - Accelio Present Output Designer 5.4 |\n| Features Demonstrated: | - Primary bookmarks in a PDF file. |\n|  | - Secondary bookmarks in a PDF file. |\n\n## Overview\n\nThis sample consists of a simple form containing four distinct fields. The data file contains eight separate records.\nBy default, the data file will produce a PDF file containing eight separate pages. The selective use of the bookmark file will produce the same PDF with a separate pane containing bookmarks. This screenshot of the sample output shows a PDF file with bookmarks.\n![img-0.jpeg](img-0.jpeg)\n\nThe left pane displays the available bookmarks for this PDF. You may need to enable the display of bookmarks in Adobe Acrobata Reader by clicking Window > Show Bookmarks. Selecting a date from the left pane displays the corresponding page within the document.\nNote that the index has been sorted according to the specification in the bookmark file, and that pages within the file are created according to the original order in the data file.",
+      "images": [
+        {
+          "id": "img-0.jpeg"
+        }
+      ],
+      "dimensions": {
+        "dpi": 200,
+        "height": 2200,
+        "width": 1700
+      }
+    },
+    {
+      "index": 1,
+      "markdown": "# $\\Theta$ \n\n## ACCELIO.\n\n## Sample Data File\n\n```\nreformat trunc\nsymbolset WINLATIN1\nfield trans_date\n2000-01-1\n`field description\nDescription for item #1\n`field trans_type\nTYPE1\n`field trans_amount\n11.00\n`page 1\n`field trans_date\n2000-01-2\n`field description\nDescription for item #2\n`field trans_type\nTYPE2\n`field trans_amount\n11.00\n`page 1\n`field trans_date\n2000-01-3\n`field description\nDescription for item #3\n`field trans_type\nTYPE3\n```\n\nThe example bookmark file includes three distinct sections:\n\n- Invoices sorted, ascending, by date.\n- Invoices sorted, ascending, by item type.\n- Invoices sorted, descending, by transaction amount.",
+      "images": [],
+      "dimensions": {
+        "dpi": 200,
+        "height": 2200,
+        "width": 1700
+      }
+    },
+    {
+      "index": 2,
+      "markdown": "# $\\square$ \n\n## ACCELIO.\n\n## Sample Files\n\nThis sample package contains:\n\n| Filename | Description |\n| :-- | :-- |\n| ap_bookmark.IFD | The template design. |\n| ap_bookmark.mdf | The template targeted for PDF output. |\n| ap_bookmark.dat | A sample data file in DAT format. |\n| ap_bookmark.bmk | A sample bookmark file. |\n| ap_bookmark.pdf | Sample PDF output. |\n| ap_bookmark_doc.pdf | A document describing the sample. |\n\n## Deploying the Sample\n\nTo deploy this sample in your environment:\n\n1. Open the template design ap_bookmark.IFD in Output Designer and recompile the template for the appropriate presentment target.\n2. Modify the -z option in the ^job command in the data file ap_bookmark.dat to:\n\n- Identify the target output device.\n- Identify the bookmark file using the -abmk command.\n- Identify the section for which to generate bookmarks, if desired, using the -abms command.\n\nFor example,\n\n| To bookmark by ... | Use the command line parameter ... |\n| :-- | :-- |\n| Invoices | -abmkap_bookmark.bmk -abmsinvoices |\n| Type | -abmkap_bookmark.bmk -abmstype |\n| Amount | -abmkap_bookmark.bmk -abmsamount |",
+      "images": [],
+      "dimensions": {
+        "dpi": 200,
+        "height": 2200,
+        "width": 1700
+      }
+    },
+    {
+      "index": 3,
+      "markdown": "# $\\stackrel{\\rightharpoonup}{\\theta}$ \n\n## ACCELIO.\n\n3. Place the accompanying files in directories consistent with your implementation:\n\n- Place ap_bookmark.IFD in the Designs subdirectory for Output Designer.\n- Place ap_bookmark.mdf in the forms subdirectory accessible to Central.\n- Place ap_bookmark.bmk in an addressable directory.\n\n\n## Running the Sample\n\n- To run this sample, place ap_bookmark.dat in the collector directory scanned by Central.",
+      "images": [],
+      "dimensions": {
+        "dpi": 200,
+        "height": 2200,
+        "width": 1700
+      }
+    }
+  ]
+}

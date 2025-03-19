@@ -1,0 +1,3638 @@
+<!DOCTYPE html>
+
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+
+
+<title>LEVERAGING UNLABELED DATA TO PREDICT OUT-OF-DISTRIBUTION PERFORMANCE</title>
+<style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+/* Improved math styling */
+.math {
+  font-family: 'STIX Two Math', 'Latin Modern Math', serif;
+}
+mjx-container {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+.mjx-full-width {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+/* Page footer styling */
+footer.page-footer {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid #ddd;
+    font-size: 0.9em;
+    color: #666;
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">LEVERAGING UNLABELED DATA TO PREDICT
+OUT-OF-DISTRIBUTION PERFORMANCE</h1>
+</header>
+<h1 id="leveraging-unlabeled-data-to-predict-out-of-distribution-performance">LEVERAGING
+UNLABELED DATA TO PREDICT OUT-OF-DISTRIBUTION PERFORMANCE</h1>
+<p>Saurabh Garg*<br/>Carnegie Mellon
+University<br/>sgarg2@andrew.cmu.edu<br/>Sivaraman
+Balakrishnan<br/>Carnegie Mellon
+University<br/>sbalakri@andrew.cmu.edu<br/>Zachary C. Lipton<br/>Carnegie
+Mellon University<br/>zlipton@andrew.cmu.edu</p>
+<h2 id="behnam-neyshabur">Behnam Neyshabur</h2>
+<p>Google Research, Blueshift team neyshabur@google.com</p>
+<p>Hanie Sedghi<br/>Google Research, Brain team<br/>hsedghi@google.com</p>
+<h4 id="abstract">Abstract</h4>
+<p>Real-world machine learning deployments are characterized by
+mismatches between the source (training) and target (test) distributions
+that may cause performance drops. In this work, we investigate methods
+for predicting the target domain accuracy using only labeled source data
+and unlabeled target data. We propose Average Thresholded Confidence
+(ATC), a practical method that learns a threshold on the model’s
+confidence, predicting accuracy as the fraction of unlabeled examples
+for which model confidence exceeds that threshold. ATC outperforms
+previous methods across several model architectures, types of
+distribution shifts (e.g., due to synthetic corruptions, dataset
+reproduction, or novel subpopulations), and datasets (WILDS, ImageNet,
+BREEDS, CIFAR, and MNIST). In our experiments, ATC estimates target
+performance <span class="math inline">$2-4 \times$</span> more
+accurately than prior methods. We also explore the theoretical
+foundations of the problem, proving that, in general, identifying the
+accuracy is just as hard as identifying the optimal predictor and thus,
+the efficacy of any method rests upon (perhaps unstated) assumptions on
+the nature of the shift. Finally, analyzing our method on some toy
+distributions, we provide insights concerning when it works <span class="math inline">${ }^{1}$</span>.</p>
+<h2 id="introduction">1 INTRODUCTION</h2>
+<p>Machine learning models deployed in the real world typically
+encounter examples from previously unseen distributions. While the IID
+assumption enables us to evaluate models using held-out data from the
+source distribution (from which training data is sampled), this estimate
+is no longer valid in presence of a distribution shift. Moreover, under
+such shifts, model accuracy tends to degrade (Szegedy et al., 2014;
+Recht et al., 2019; Koh et al., 2021). Commonly, the only data available
+to the practitioner are a labeled training set (source) and unlabeled
+deployment-time data which makes the problem more difficult. In this
+setting, detecting shifts in the distribution of covariates is known to
+be possible (but difficult) in theory (Ramdas et al., 2015), and in
+practice (Rabanser et al., 2018). However, producing an optimal
+predictor using only labeled source and unlabeled target data is
+well-known to be impossible absent further assumptions (Ben-David et
+al., 2010; Lipton et al., 2018).</p>
+<p>Two vital questions that remain are: (i) the precise conditions under
+which we can estimate a classifier’s target-domain accuracy; and (ii)
+which methods are most practically useful. To begin, the straightforward
+way to assess the performance of a model under distribution shift would
+be to collect labeled (target domain) examples and then to evaluate the
+model on that data. However, collecting fresh labeled data from the
+target distribution is prohibitively expensive and time-consuming,
+especially if the target distribution is non-stationary. Hence, instead
+of using labeled data, we aim to use unlabeled data from the target
+distribution, that is comparatively abundant, to predict model
+performance. Note that in this work, our focus is not to improve
+performance on the target but, rather, to estimate the accuracy on the
+target for a given classifier.</p>
+<p>[^0] [^0]: * Work done in part while Saurabh Garg was interning at
+Google <span class="math inline">${ }^{1}$</span> Code is available at
+https://github.com/saurabhgarg1996/ATC_code.</p>
+<figure>
+<img alt="img-0.jpeg" src="img-0.jpeg"/>
+<figcaption aria-hidden="true">img-0.jpeg</figcaption>
+</figure>
+<p>Figure 1: Illustration of our proposed method ATC. Left: using source
+domain validation data, we identify a threshold on a score
+(e.g. negative entropy) computed on model confidence such that fraction
+of examples above the threshold matches the validation set accuracy. ATC
+estimates accuracy on unlabeled target data as the fraction of examples
+with the score above the threshold. Interestingly, this threshold yields
+accurate estimates on a wide set of target distributions resulting from
+natural and synthetic shifts. Right: Efficacy of ATC over previously
+proposed approaches on our testbed with a post-hoc calibrated model. To
+obtain errors on the same scale, we rescale all errors with Average
+Confidence (AC) error. Lower estimation error is better. See Table 1 for
+exact numbers and comparison on various types of distribution shift. See
+Sec. 5 for details on our testbed.</p>
+<p>Recently, numerous methods have been proposed for this purpose (Deng
+&amp; Zheng, 2021; Chen et al., 2021b; Jiang et al., 2021; Deng et al.,
+2021; Guillory et al., 2021). These methods either require calibration
+on the target domain to yield consistent estimates (Jiang et al., 2021;
+Guillory et al., 2021) or additional labeled data from several target
+domains to learn a linear regression function on a distributional
+distance that then predicts model performance (Deng et al., 2021; Deng
+&amp; Zheng, 2021; Guillory et al., 2021). However, methods that require
+calibration on the target domain typically yield poor estimates since
+deep models trained and calibrated on source data are not, in general,
+calibrated on a (previously unseen) target domain (Ovadia et al., 2019).
+Besides, methods that leverage labeled data from target domains rely on
+the fact that unseen target domains exhibit strong linear correlation
+with seen target domains on the underlying distance measure and, hence,
+can be rendered ineffective when such target domains with labeled data
+are unavailable (in Sec. 5.1 we demonstrate such a failure on a
+real-world distribution shift problem). Therefore, throughout the paper,
+we assume access to labeled source data and only unlabeled data from
+target domain(s). In this work, we first show that absent assumptions on
+the source classifier or the nature of the shift, no method of
+estimating accuracy will work generally (even in non-contrived
+settings). To estimate accuracy on target domain perfectly, we highlight
+that even given perfect knowledge of the labeled source distribution
+(i.e., <span class="math inline">$p_{s}(x, y)$</span> ) and unlabeled
+target distribution (i.e., <span class="math inline">$p_{t}(x)$</span>
+), we need restrictions on the nature of the shift such that we can
+uniquely identify the target conditional <span class="math inline">$p_{t}(y \mid x)$</span>. Thus, in general,
+identifying the accuracy of the classifier is as hard as identifying the
+optimal predictor. Second, motivated by the superiority of methods that
+use maximum softmax probability (or logit) of a model for
+Out-Of-Distribution (OOD) detection (Hendrycks &amp; Gimpel, 2016;
+Hendrycks et al., 2019), we propose a simple method that leverages
+softmax probability to predict model performance. Our method, Average
+Thresholded Confidence (ATC), learns a threshold on a score (e.g.,
+maximum confidence or negative entropy) of model confidence on
+validation source data and predicts target domain accuracy as the
+fraction of unlabeled target points that receive a score above that
+threshold. ATC selects a threshold on validation source data such that
+the fraction of source examples that receive the score above the
+threshold match the accuracy of those examples. Our primary contribution
+in ATC is the proposal of obtaining the threshold and observing its
+efficacy on (practical) accuracy estimation. Importantly, our work takes
+a step forward in positively answering the question raised in Deng &amp;
+Zheng (2021); Deng et al. (2021) about a practical strategy to select a
+threshold that enables accuracy prediction with thresholded model
+confidence.</p>
+<p>ATC is simple to implement with existing frameworks, compatible with
+arbitrary model classes, and dominates other contemporary methods.
+Across several model architectures on a range of benchmark vision and
+language datasets, we verify that ATC outperforms prior methods by at
+least <span class="math inline">$2-4 \times$</span> in predicting
+target accuracy on a variety of distribution shifts. In particular, we
+consider shifts due to common corruptions (e.g., ImageNet-C), natural
+distribution shifts due to dataset reproduction (e.g., ImageNet-v2,
+ImageNet-R), shifts due to novel subpopulations (e.g., BREEDS), and
+distribution shifts faced in the wild (e.g., WILDS).</p>
+<p>As a starting point for theory development, we investigate ATC on a
+simple toy model that models distribution shift with varying proportions
+of the population with spurious features, as in Nagarajan et al. (2020).
+Finally, we note that although ATC achieves superior performance in our
+empirical evaluation, like all methods, it must fail (returns
+inconsistent estimates) on certain types of distribution shifts, per our
+impossibility result.</p>
+<h1 id="prior-work">2 PRIOR WORK</h1>
+<p>Out-of-distribution detection. The main goal of OOD detection is to
+identify previously unseen examples, i.e., samples out of the support of
+training distribution. To accomplish this, modern methods utilize
+confidence or features learned by a deep network trained on some source
+data. Hendrycks &amp; Gimpel (2016); Geifman &amp; El-Yaniv (2017) used
+the confidence score of an (already) trained deep model to identify OOD
+points. Lakshminarayanan et al. (2016) use entropy of an ensemble model
+to evaluate prediction uncertainty on OOD points. To improve OOD
+detection with model confidence, Liang et al. (2017) propose to use
+temperature scaling and input perturbations. Jiang et al. (2018) propose
+to use scores based on the relative distance of the predicted class to
+the second class. Recently, residual flow-based methods were used to
+obtain a density model for OOD detection (Zhang et al., 2020). Ji et
+al. (2021) proposed a method based on subfunction error bounds to
+compute unreliability per sample. Refer to Ovadia et al. (2019); Ji et
+al. (2021) for an overview and comparison of methods for prediction
+uncertainty on OOD data.</p>
+<p>Predicting model generalization. Understanding generalization
+capabilities of overparameterized models on in-distribution data using
+conventional machine learning tools has been a focus of a long line of
+work; representative research includes Neyshabur et al. (2015; 2017);
+Neyshabur (2017); Neyshabur et al. (2018); Dziugaite &amp; Roy (2017);
+Bartlett et al. (2017); Zhou et al. (2018); Long &amp; Sedghi (2019);
+Nagarajan &amp; Kolter (2019a). At a high level, this line of research
+bounds the generalization gap directly with complexity measures
+calculated on the trained model. However, these bounds typically remain
+numerically loose relative to the true generalization error (Zhang et
+al., 2016; Nagarajan &amp; Kolter, 2019b). On the other hand, another
+line of research departs from complexitybased approaches to use unseen
+unlabeled data to predict in-distribution generalization (Platanios et
+al., 2016; 2017; Garg et al., 2021; Jiang et al., 2021).</p>
+<p>Relevant to our work are methods for predicting the error of a
+classifier on OOD data based on unlabeled data from the target (OOD)
+domain. These methods can be characterized into two broad categories:
+(i) Methods which explicitly predict correctness of the model on
+individual unlabeled points (Deng &amp; Zheng, 2021; Jiang et al., 2021;
+Deng et al., 2021; Chen et al., 2021a); and (ii) Methods which directly
+obtain an estimate of error with unlabeled OOD data without making a
+point-wise prediction (Chen et al., 2021b; Guillory et al., 2021; Chuang
+et al., 2020). To achieve a consistent estimate of the target accuracy,
+Jiang et al. (2021); Guillory et al. (2021) require calibration on
+target domain. However, these methods typically yield poor estimates as
+deep models trained and calibrated on some source data are seldom
+calibrated on previously unseen domains (Ovadia et al., 2019).
+Additionally, Deng &amp; Zheng (2021); Guillory et al. (2021) derive
+model-based distribution statistics on unlabeled target set that
+correlate with the target accuracy and propose to use a subset of
+labeled target domains to learn a (linear) regression function that
+predicts model performance. However, there are two drawbacks with this
+approach: (i) the correlation of these distribution statistics can vary
+substantially as we consider different nature of shifts (refer to Sec.
+5.1, where we empirically demonstrate this failure); (ii) even if there
+exists a (hypothetical) statistic with strong correlations, obtaining
+labeled target domains (even simulated ones) with strong correlations
+would require significant a priori knowledge about the nature of shift
+that, in general, might not be available before models are deployed in
+the wild. Nonetheless, in our work, we only assume access to labeled
+data from the source domain presuming no access to labeled target
+domains or information about how to simulate them.</p>
+<p>Moreover, unlike the parallel work of Deng et al. (2021), we do not
+focus on methods that alter the training on source data to aid accuracy
+prediction on the target data. Chen et al. (2021b) propose an importance
+re-weighting based approach that leverages (additional) information
+about the axis along which distribution is shifting in form of “slicing
+functions”. In our work, we make comparisons with importance
+re-weighting baseline from Chen et al. (2021b) as we do not have any
+additional information about the axis along which the distribution is
+shifting.</p>
+<h1 id="problem-setup">3 Problem Setup</h1>
+<p>Notation. By <span class="math inline">$\|\cdot|$</span>, and <span class="math inline">$\langle\cdot, \cdot\rangle$</span> we denote the
+Euclidean norm and inner product, respectively. For a vector <span class="math inline">$v \in \mathbb{R}^{d}$</span>, we use <span class="math inline">$v_{j}$</span> to denote its <span class="math inline">$j^{\text {th }}$</span> entry, and for an event
+<span class="math inline">$E$</span> we let <span class="math inline">$\mathbb{I}[E]$</span> denote the binary indicator
+of the event. Suppose we have a multi-class classification problem with
+the input domain <span class="math inline">\(\mathcal{X} \subseteq
+\mathbb{R}^{d}\)</span> and label space <span class="math inline">$\mathcal{Y}=\{1,2, \ldots, k\}$</span>. For
+binary classification, we use <span class="math inline">$\mathcal{Y}=\{0,1\}$</span>. By <span class="math inline">$\mathcal{D}^{\mathcal{S}}$</span> and <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span>, we denote
+source and target distribution over <span class="math inline">$\mathcal{X} \times \mathcal{Y}$</span>. For
+distributions <span class="math inline">$\mathcal{D}^{\mathcal{S}}$</span> and <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span>, we define <span class="math inline">$p_{\mathcal{S}}$</span> or <span class="math inline">$p_{\mathrm{T}}$</span> as the corresponding
+probability density (or mass) functions. A dataset <span class="math inline">\$S:=\left\{\left(x_{i},
+y_{i}\right$\right\}_{i=1}^{n}
+\sim\left(\mathcal{D}^{\mathcal{S}}\right)^{n}\)</span> contains <span class="math inline">$n$</span> points sampled i.i.d. from <span class="math inline">$\mathcal{D}^{\mathcal{S}}$</span>. Let <span class="math inline">$\mathcal{F}$</span> be a class of hypotheses
+mapping <span class="math inline">$\mathcal{X}$</span> to <span class="math inline">$\Delta^{k-1}$</span> where <span class="math inline">$\Delta^{k-1}$</span> is a simplex in <span class="math inline">$k$</span> dimensions. Given a classifier <span class="math inline">$f \in \mathcal{F}$</span> and datum <span class="math inline">$x, y$</span>, we denote the <span class="math inline">$0-1$</span> error (i.e., classification error) on
+that point by <span class="math inline">\(\mathcal{E}(f(x),
+y):=\mathbb{I}\left[y \notin \arg \max _{j \in \mathcal{Y}}
+f_{j}(x)\right]\)</span>. Given a model <span class="math inline">\(f
+\in \mathcal{F}\)</span>, our goal in this work is to understand the
+performance of <span class="math inline">$f$</span> on <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span> without access
+to labeled data from <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span>. Note that our
+goal is not to adapt the model to the target data. Concretely, we aim to
+predict accuracy of <span class="math inline">$f$</span> on <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span>. Throughout this
+paper, we assume we have access to the following: (i) model <span class="math inline">$f$</span>; (ii) previously-unseen (validation)
+data from <span class="math inline">$\mathcal{D}^{\mathcal{S}}$</span>; and (iii)
+unlabeled data from target distribution <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span>.</p>
+<h3 id="accuracy-estimation-possibility-and-impossibility-results">3.1
+Accuracy Estimation: Possibility and Impossibility Results</h3>
+<p>First, we investigate the question of when it is possible to estimate
+the target accuracy of an arbitrary classifier, even given knowledge of
+the full source distribution <span class="math inline">\(p_{s}(x,
+y)\)</span> and target marginal <span class="math inline">$p_{t}(x)$</span>. Absent assumptions on the
+nature of shift, estimating target accuracy is impossible. Even given
+access to <span class="math inline">$p_{s}(x, y)$</span> and <span class="math inline">$p_{t}(x)$</span>, the problem is fundamentally
+unidentifiable because <span class="math inline">\(p_{t}(y \mid
+x)\)</span> can shift arbitrarily. In the following proposition, we show
+that absent assumptions on the classifier <span class="math inline">$f$</span> (i.e., when <span class="math inline">$f$</span> can be any classifier in the space of
+all classifiers on <span class="math inline">$\mathcal{X}$</span> ),
+we can estimate accuracy on the target data iff assumptions on the
+nature of the shift, together with <span class="math inline">\(p_{s}(x,
+y)\)</span> and <span class="math inline">$p_{t}(x)$</span>, uniquely
+identify the (unknown) target conditional <span class="math inline">$p_{t}(y \mid x)$</span>. We relegate proofs from
+this section to App. A. Proposition 1. Absent further assumptions,
+accuracy on the target is identifiable iff <span class="math inline">$p_{t}(y \mid x)$</span> is uniquely identified
+given <span class="math inline">$p_{s}(x, y)$</span> and <span class="math inline">$p_{t}(x)$</span>.</p>
+<p>Proposition 1 states that we need enough constraints on nature of
+shift such that <span class="math inline">$p_{s}(x, y)$</span> and
+<span class="math inline">$p_{t}(x)$</span> identifies unique <span class="math inline">$p_{t}(y \mid x)$</span>. It also states that
+under some assumptions on the nature of the shift, we can hope to
+estimate the model’s accuracy on target data. We will illustrate this on
+two common assumptions made in domain adaptation literature: (i)
+covariate shift (Heckman, 1977; Shimodaira, 2000) and (ii) label shift
+(Saerens et al., 2002; Zhang et al., 2013; Lipton et al., 2018). Under
+covariate shift assumption, that the target marginal support <span class="math inline">$\operatorname{supp}\left(p_{t}(x)\right)$</span>
+is a subset of the source marginal support <span class="math inline">$\operatorname{supp}\left(p_{s}(x)\right)$</span>
+and that the conditional distribution of labels given inputs does not
+change within support, i.e., <span class="math inline">\(p_{s}(y \mid
+x)=p_{t}(y \mid x)\)</span>, which, trivially, identifies a unique
+target conditional <span class="math inline">$p_{t}(y \mid x)$</span>.
+Under label shift, the reverse holds, i.e., the class-conditional
+distribution does not change <span class="math inline">\(\left(p_{s}(x
+\mid y)=p_{t}(x \mid y)\right)\)</span> and, again, information about
+<span class="math inline">$p_{t}(x)$</span> uniquely determines the
+target conditional <span class="math inline">$p_{t}(y \mid x)$</span>
+(Lipton et al., 2018; Garg et al., 2020). In these settings, one can
+estimate an arbitrary classifier’s accuracy on the target domain either
+by using importance re-weighting with the ratio <span class="math inline">$p_{t}(x) / p_{s}(x)$</span> in case of covariate
+shift or by using importance re-weighting with the ratio <span class="math inline">$p_{t}(y) / p_{s}(y)$</span> in case of label
+shift. While importance ratios in the former case can be obtained
+directly when <span class="math inline">$p_{t}(x)$</span> and <span class="math inline">$p_{s}(x)$</span> are known, the importance ratios
+in the latter case can be obtained by using techniques from Saerens et
+al. (2002); Lipton et al. (2018); Azizzadenesheli et al. (2019);
+Alexandari et al. (2019). In App. B, we explore accuracy estimation in
+the setting of these shifts and present extensions to generalized
+notions of label shift (Tachet des Combes et al., 2020) and covariate
+shift (Rojas-Carulla et al., 2018).</p>
+<p>As a corollary of Proposition 1, we now present a simple
+impossibility result, demonstrating that no single method can work for
+all families of distribution shift.</p>
+<p>Corollary 1. Absent assumptions on the classifier <span class="math inline">$f$</span>, no method of estimating accuracy will
+work in all scenarios, i.e., for different nature of distribution
+shifts.</p>
+<p>Intuitively, this result states that every method of estimating
+accuracy on target data is tied up with some assumption on the nature of
+the shift and might not be useful for estimating accuracy under a
+different assumption on the nature of the shift. For illustration,
+consider a setting where we have access to distribution <span class="math inline">$p_{s}(x, y)$</span> and <span class="math inline">$p_{t}(x)$</span>. Additionally, assume that the
+distribution can shift only due to covariate shift or label shift
+without any knowledge about which one. Then Corollary 1 says that it is
+impossible to have a single method that will simultaneously for both
+label shift and covariate shift as in the following example (we spell
+out the details in App. A):</p>
+<p>Example 1. Assume binary classification with <span class="math inline">\(p_{s}(x)=\alpha \cdot
+\phi\left(\mu_{1}\right)+(1-\alpha) \cdot
+\phi\left(\mu_{2}\right)\)</span>, <span class="math inline">\(p_{s}$x
+\mid y=0$=\phi\left(\mu_{1}\right), p_{s}$x \mid
+y=1$=\phi\left(\mu_{2}\right)\)</span>, and <span class="math inline">\(p_{t}(x)=\beta \cdot
+\phi\left(\mu_{1}\right)+(1-\beta) \cdot
+\phi\left(\mu_{2}\right)\)</span> where <span class="math inline">\(\phi(\mu)=\mathcal{N}(\mu, 1), \alpha, \beta
+\in(0,1)\)</span>, and <span class="math inline">\(\alpha \neq
+\beta\)</span>. Error of a classifier <span class="math inline">$f$</span> on target data is given by <span class="math inline">\$\mathcal{E}_{1}=\mathbb{E}_{(x, y$ \sim p_{s}(x,
+y)}\left[\frac{p_{t}(x)}{p_{s}(x)} \mathbb{I}[f(x) \neq
+y]\right]\)</span> under covariate shift and by <span class="math inline">$\mathcal{E}_{2}=$</span> <span class="math inline">\(\mathbb{E}_{(x, y) \sim p_{s}(x,
+y)}\left[\left$\frac{\beta}{\alpha}
+\mathbb{I}[y=0]+\frac{1-\beta}{1-\alpha} \mathbb{I}[y=1]\right$
+\mathbb{I}[f(x) \neq y]\right]\)</span> under label shift. In App. A, we
+show that <span class="math inline">\(\mathcal{E}_{1} \neq
+\mathcal{E}_{2}\)</span> for all <span class="math inline">$f$</span>.
+Thus, given access to <span class="math inline">$p_{s}(x, y)$</span>,
+and <span class="math inline">$p_{t}(x)$</span>, any method that
+consistently estimates error of a classifer under covariate shift will
+give an incorrect estimate of error under label shift and vice-versa.
+The reason is that the same <span class="math inline">$p_{t}(x)$</span> and <span class="math inline">$p_{s}(x, y)$</span> can correspond to error <span class="math inline">$\mathcal{E}_{1}$</span> (under covariate shift)
+or error <span class="math inline">$\mathcal{E}_{2}$</span> (under
+label shift) and determining which scenario one faces requires further
+assumptions on the nature of shift.</p>
+<h1 id="predicting-accuracy-with-average-thresholded-confidence">4
+Predicting accuracy with Average Thresholded CONFIDENCE</h1>
+<p>In this section, we present our method ATC that leverages a black box
+classifier <span class="math inline">$f$</span> and (labeled)
+validation source data to predict accuracy on target domain given access
+to unlabeled target data. Throughout the discussion, we assume that the
+classifier <span class="math inline">$f$</span> is fixed. Before
+presenting our method, we introduce some terminology. Define a score
+function <span class="math inline">\(s: \Delta^{k-1}
+\rightarrow\)</span> <span class="math inline">$\mathbb{R}$</span>
+that takes in the softmax prediction of the function <span class="math inline">$f$</span> and outputs a scalar. We want a score
+function such that if the score function takes a high value at a datum
+<span class="math inline">$x, y$</span> then <span class="math inline">$f$</span> is likely to be correct. In this work,
+we explore two such score functions: (i) Maximum confidence, i.e., <span class="math inline">\(s(f(x))=\max _{j \in \mathcal{Y}}
+f_{j}(x)\)</span>; and (ii) Negative Entropy, i.e., <span class="math inline">\(s(f(x))=\sum_{j} f_{j}(x) \log
+\left(f_{j}(x)\right)\)</span>. Our method identifies a threshold <span class="math inline">$t$</span> on source data <span class="math inline">$\mathcal{D}^{\mathbb{S}}$</span> such that the
+expected number of points that obtain a score less than <span class="math inline">$t$</span> match the error of <span class="math inline">$f$</span> on <span class="math inline">$\mathcal{D}^{\mathbb{S}}$</span>, i.e.,</p>
+<p><span class="math display">\[
+\mathbb{E}_{x \sim
+\mathcal{D}^{\mathbb{S}}}[\mathbb{I}[s(f(x))&lt;t]]=\mathbb{E}_{(x, y)
+\sim \mathcal{D}^{\mathbb{S}}}\left[\mathbb{I}\left[\arg \max _{j \in
+\mathcal{Y}} f_{j}(x) \neq y\right]\right]
+\]</span></p>
+<p>and then our error estimate <span class="math inline">$\mathrm{ATC}_{\mathcal{D}^{\mathrm{T}}}(s)$</span>
+on the target domain <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span> is given by the
+expected number of target points that obtain a score less than <span class="math inline">$t$</span>, i.e.,</p>
+<p><span class="math display">\[
+\operatorname{ATC}_{\mathcal{D}^{\mathrm{T}}}(s)=\mathbb{E}_{x \sim
+\mathcal{D}^{\mathrm{T}}}[\mathbb{I}[s(f(x))&lt;t]]
+\]</span></p>
+<p>In short, in (1), ATC selects a threshold on the score function such
+that the error in the source domain matches the expected number of
+points that receive a score below <span class="math inline">$t$</span>
+and in (2), ATC predicts error on the target domain as the fraction of
+unlabeled points that obtain a score below that threshold <span class="math inline">$t$</span>. Note that, in principle, there exists
+a different threshold <span class="math inline">$t^{\prime}$</span> on
+the target distribution <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span> such that (1) is
+satisfied on <span class="math inline">$\mathcal{D}^{\mathrm{T}}$</span>. However, in our
+experiments, the same threshold performs remarkably well. The main
+empirical contribution of our work is to show that the threshold
+obtained with (1) might be used effectively in condunction with modern
+deep networks in a wide range of settings to estimate error on the
+target data. In practice, to obtain the threshold with ATC, we minimize
+the difference between the expression on two sides of (1) using finite
+samples. In the next section, we show that ATC precisely predicts
+accuracy on the OOD data on the desired line <span class="math inline">$y=x$</span>. In App. C, we discuss an alternate
+interpretation of the method and make connections with OOD detection
+methods.</p>
+<h2 id="experiments">5 EXPERIMENTS</h2>
+<p>We now empirical evaluate ATC and compare it with existing methods.
+In each of our main experiment, keeping the underlying model fixed, we
+vary target datasets and make a prediction</p>
+<figure>
+<img alt="img-1.jpeg" src="img-1.jpeg"/>
+<figcaption aria-hidden="true">img-1.jpeg</figcaption>
+</figure>
+<p>Figure 2: Scatter plot of predicted accuracy versus (true) OOD
+accuracy. Each point denotes a different OOD dataset, all evaluated with
+the same DenseNet121 model. We only plot the best three methods. With
+ATC (ours), we refer to ATC-NE. We observe that ATC significantly
+outperforms other methods and with ATC, we recover the desired line
+<span class="math inline">$y=x$</span> with a robust linear fit.
+Aggregated estimation error in Table 1 and plots for other datasets and
+architectures in App. H. of the target accuracy with various methods
+given access to only unlabeled data from the target. Unless noted
+otherwise, all models are trained only on samples from the source
+distribution with the main exception of pre-training on a different
+distribution. We use labeled examples from the target distribution to
+only obtain true error estimates.</p>
+<p>Datasets. First, we consider synthetic shifts induced due to
+different visual corruptions (e.g., shot noise, motion blur etc.) under
+ImageNet-C (Hendrycks &amp; Dietterich, 2019). Next, we consider natural
+shifts due to differences in the data collection process of ImageNet
+(Russakovsky et al., 2015), e.g, ImageNetv2 (Recht et al., 2019). We
+also consider images with artistic renditions of object classes, i.e.,
+ImageNet-R (Hendrycks et al., 2021) and ImageNet-Sketch (Wang et al.,
+2019). Note that renditions dataset only contains a subset 200 classes
+from ImageNet. To include renditions dataset in our testbed, we include
+results on ImageNet restricted to these 200 classes (which we call
+ImageNet-200) along with full ImageNet.</p>
+<p>Second, we consider BREEDs (Santurkar et al., 2020) to assess
+robustness to subpopulation shifts, in particular, to understand how
+accuracy estimation methods behave when novel subpopulations not
+observed during training are introduced. BREEDS leverages class
+hierarchy in ImageNet to create 4 datasets Entity-13, Entity-30,
+Living-17, Non-Living-26. We focus on natural and synthetic shifts as in
+ImageNet on same and different subpopulations in BREEDs. Third, from
+Wilds (Koh et al., 2021) benchmark, we consider FMoW-WILDS (Christie et
+al., 2018), RxRx1-WILDS (Taylor et al., 2019), Amazon-WILDS (Ni et al.,
+2019), CivilComments-WILDS (Borkan et al., 2019) to consider
+distribution shifts faced in the wild.</p>
+<p>Finally, similar to ImageNet, we consider (i) synthetic shifts
+(CIFAR-10-C) due to common corruptions; and (ii) natural shift (i.e.,
+CIFARv2 (Recht et al., 2018)) on CIFAR-10 (Krizhevsky &amp; Hinton,
+2009). On CIFAR-100, we just have synthetic shifts due to common
+corruptions. For completeness, we also consider natural shifts on MNIST
+(LeCun et al., 1998) as in the prior work (Deng &amp; Zheng, 2021). We
+use three real shifted datasets, i.e., USPS (Hull, 1994), SVHN (Netzer
+et al., 2011) and QMNIST (Yadav &amp; Bottou, 2019). We give a detailed
+overview of our setup in App. F. Architectures and Evaluation. For
+ImageNet, BREEDs, CIFAR, FMoW-WILDS, RxRx1-WILDS datasets, we use
+DenseNet121 (Huang et al., 2017) and ResNet50 (He et al., 2016)
+architectures. For Amazon-WILDS and CivilComments-WILDS, we fine-tune a
+DistilBERT-base-uncased (Sanh et al., 2019) model. For MNIST, we train a
+fully connected multilayer perceptron. We use standard training with
+benchmarked hyperparameters. To compare methods, we report average
+absolute difference between the true accuracy on the target data and the
+estimated accuracy on the same unlabeled examples. We refer to this
+metric as Mean Absolute estimation Error (MAE). Along with MAE, we also
+show scatter plots to visualize performance at individual target sets.
+Refer to App. G for additional details on the setup. Methods With
+ATC-NE, we denote ATC with negative entropy score function and with
+ATC-MC, we denote ATC with maximum confidence score function. For all
+methods, we implement post-hoc calibration on validation source data
+with Temperature Scaling (TS; Guo et al. (2017)). Below we briefly
+discuss baselines methods compared in our work and relegate details to
+App. E.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Dataset</th>
+<th style="text-align: center;">Shift</th>
+<th style="text-align: center;">IM</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">AC</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">DOC</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">GDE</th>
+<th style="text-align: center;">ATC-MC (Ours)</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">ATC-NE (Ours)</th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR10</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">6.60</td>
+<td style="text-align: center;">5.74</td>
+<td style="text-align: center;">9.88</td>
+<td style="text-align: center;">6.89</td>
+<td style="text-align: center;">7.25</td>
+<td style="text-align: center;">6.07</td>
+<td style="text-align: center;">4.77</td>
+<td style="text-align: center;">3.21</td>
+<td style="text-align: center;">3.02</td>
+<td style="text-align: center;">2.99</td>
+<td style="text-align: center;">2.85</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">12.33</td>
+<td style="text-align: center;">10.20</td>
+<td style="text-align: center;">16.50</td>
+<td style="text-align: center;">11.91</td>
+<td style="text-align: center;">13.87</td>
+<td style="text-align: center;">11.08</td>
+<td style="text-align: center;">6.55</td>
+<td style="text-align: center;">4.65</td>
+<td style="text-align: center;">4.25</td>
+<td style="text-align: center;">4.21</td>
+<td style="text-align: center;">3.87</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR100</td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">13.69</td>
+<td style="text-align: center;">11.51</td>
+<td style="text-align: center;">23.61</td>
+<td style="text-align: center;">13.10</td>
+<td style="text-align: center;">14.60</td>
+<td style="text-align: center;">10.14</td>
+<td style="text-align: center;">9.85</td>
+<td style="text-align: center;">5.50</td>
+<td style="text-align: center;">4.75</td>
+<td style="text-align: center;">4.72</td>
+<td style="text-align: center;">4.94</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet200</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">12.37</td>
+<td style="text-align: center;">8.19</td>
+<td style="text-align: center;">22.07</td>
+<td style="text-align: center;">8.61</td>
+<td style="text-align: center;">15.17</td>
+<td style="text-align: center;">7.81</td>
+<td style="text-align: center;">5.13</td>
+<td style="text-align: center;">4.37</td>
+<td style="text-align: center;">2.04</td>
+<td style="text-align: center;">3.79</td>
+<td style="text-align: center;">1.45</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">19.86</td>
+<td style="text-align: center;">12.94</td>
+<td style="text-align: center;">32.44</td>
+<td style="text-align: center;">13.35</td>
+<td style="text-align: center;">25.02</td>
+<td style="text-align: center;">12.38</td>
+<td style="text-align: center;">5.41</td>
+<td style="text-align: center;">5.93</td>
+<td style="text-align: center;">3.09</td>
+<td style="text-align: center;">5.00</td>
+<td style="text-align: center;">2.68</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">7.77</td>
+<td style="text-align: center;">6.50</td>
+<td style="text-align: center;">18.13</td>
+<td style="text-align: center;">6.02</td>
+<td style="text-align: center;">8.13</td>
+<td style="text-align: center;">5.76</td>
+<td style="text-align: center;">6.23</td>
+<td style="text-align: center;">3.88</td>
+<td style="text-align: center;">2.17</td>
+<td style="text-align: center;">2.06</td>
+<td style="text-align: center;">0.80</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">13.39</td>
+<td style="text-align: center;">10.12</td>
+<td style="text-align: center;">24.62</td>
+<td style="text-align: center;">8.51</td>
+<td style="text-align: center;">13.55</td>
+<td style="text-align: center;">7.90</td>
+<td style="text-align: center;">6.32</td>
+<td style="text-align: center;">3.34</td>
+<td style="text-align: center;">2.53</td>
+<td style="text-align: center;">2.61</td>
+<td style="text-align: center;">4.89</td>
+</tr>
+<tr>
+<td style="text-align: center;">FMoW-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">5.53</td>
+<td style="text-align: center;">4.31</td>
+<td style="text-align: center;">33.53</td>
+<td style="text-align: center;">12.84</td>
+<td style="text-align: center;">5.94</td>
+<td style="text-align: center;">4.45</td>
+<td style="text-align: center;">5.74</td>
+<td style="text-align: center;">3.06</td>
+<td style="text-align: center;">2.70</td>
+<td style="text-align: center;">3.02</td>
+<td style="text-align: center;">2.72</td>
+</tr>
+<tr>
+<td style="text-align: center;">RxRx1-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">5.80</td>
+<td style="text-align: center;">5.72</td>
+<td style="text-align: center;">7.90</td>
+<td style="text-align: center;">4.84</td>
+<td style="text-align: center;">5.98</td>
+<td style="text-align: center;">5.98</td>
+<td style="text-align: center;">6.03</td>
+<td style="text-align: center;">4.66</td>
+<td style="text-align: center;">4.56</td>
+<td style="text-align: center;">4.41</td>
+<td style="text-align: center;">4.47</td>
+</tr>
+<tr>
+<td style="text-align: center;">Amazon-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">2.40</td>
+<td style="text-align: center;">2.29</td>
+<td style="text-align: center;">8.01</td>
+<td style="text-align: center;">2.38</td>
+<td style="text-align: center;">2.40</td>
+<td style="text-align: center;">2.28</td>
+<td style="text-align: center;">17.87</td>
+<td style="text-align: center;">1.65</td>
+<td style="text-align: center;">1.62</td>
+<td style="text-align: center;">1.60</td>
+<td style="text-align: center;">1.50</td>
+</tr>
+<tr>
+<td style="text-align: center;">CivilCom.-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">12.64</td>
+<td style="text-align: center;">10.80</td>
+<td style="text-align: center;">16.76</td>
+<td style="text-align: center;">11.03</td>
+<td style="text-align: center;">13.31</td>
+<td style="text-align: center;">10.99</td>
+<td style="text-align: center;">16.65</td>
+<td style="text-align: center;">7.14</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">MNIST</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">18.48</td>
+<td style="text-align: center;">15.99</td>
+<td style="text-align: center;">21.17</td>
+<td style="text-align: center;">14.81</td>
+<td style="text-align: center;">20.19</td>
+<td style="text-align: center;">14.56</td>
+<td style="text-align: center;">24.42</td>
+<td style="text-align: center;">5.02</td>
+<td style="text-align: center;">2.40</td>
+<td style="text-align: center;">3.14</td>
+<td style="text-align: center;">3.50</td>
+</tr>
+<tr>
+<td style="text-align: center;">EntitY-13</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">16.23</td>
+<td style="text-align: center;">11.14</td>
+<td style="text-align: center;">24.97</td>
+<td style="text-align: center;">10.88</td>
+<td style="text-align: center;">19.08</td>
+<td style="text-align: center;">10.47</td>
+<td style="text-align: center;">10.71</td>
+<td style="text-align: center;">5.39</td>
+<td style="text-align: center;">3.88</td>
+<td style="text-align: center;">4.58</td>
+<td style="text-align: center;">4.19</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">28.53</td>
+<td style="text-align: center;">22.02</td>
+<td style="text-align: center;">38.33</td>
+<td style="text-align: center;">21.64</td>
+<td style="text-align: center;">32.43</td>
+<td style="text-align: center;">21.22</td>
+<td style="text-align: center;">20.61</td>
+<td style="text-align: center;">13.58</td>
+<td style="text-align: center;">10.28</td>
+<td style="text-align: center;">12.25</td>
+<td style="text-align: center;">6.63</td>
+</tr>
+<tr>
+<td style="text-align: center;">EntitY-30</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">18.59</td>
+<td style="text-align: center;">14.46</td>
+<td style="text-align: center;">28.82</td>
+<td style="text-align: center;">14.30</td>
+<td style="text-align: center;">21.63</td>
+<td style="text-align: center;">13.46</td>
+<td style="text-align: center;">12.92</td>
+<td style="text-align: center;">9.12</td>
+<td style="text-align: center;">7.75</td>
+<td style="text-align: center;">8.15</td>
+<td style="text-align: center;">7.64</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">32.34</td>
+<td style="text-align: center;">26.85</td>
+<td style="text-align: center;">44.02</td>
+<td style="text-align: center;">26.27</td>
+<td style="text-align: center;">36.82</td>
+<td style="text-align: center;">25.42</td>
+<td style="text-align: center;">23.16</td>
+<td style="text-align: center;">17.75</td>
+<td style="text-align: center;">14.30</td>
+<td style="text-align: center;">15.60</td>
+<td style="text-align: center;">10.57</td>
+</tr>
+<tr>
+<td style="text-align: center;">NONLIVING-26</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">18.66</td>
+<td style="text-align: center;">17.17</td>
+<td style="text-align: center;">26.39</td>
+<td style="text-align: center;">16.14</td>
+<td style="text-align: center;">19.86</td>
+<td style="text-align: center;">15.58</td>
+<td style="text-align: center;">16.63</td>
+<td style="text-align: center;">10.87</td>
+<td style="text-align: center;">10.24</td>
+<td style="text-align: center;">10.07</td>
+<td style="text-align: center;">10.26</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">33.43</td>
+<td style="text-align: center;">31.53</td>
+<td style="text-align: center;">41.66</td>
+<td style="text-align: center;">29.87</td>
+<td style="text-align: center;">35.13</td>
+<td style="text-align: center;">29.31</td>
+<td style="text-align: center;">29.56</td>
+<td style="text-align: center;">21.70</td>
+<td style="text-align: center;">20.12</td>
+<td style="text-align: center;">19.08</td>
+<td style="text-align: center;">18.26</td>
+</tr>
+<tr>
+<td style="text-align: center;">LIVING-17</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">12.63</td>
+<td style="text-align: center;">11.05</td>
+<td style="text-align: center;">18.32</td>
+<td style="text-align: center;">10.46</td>
+<td style="text-align: center;">14.43</td>
+<td style="text-align: center;">10.14</td>
+<td style="text-align: center;">9.87</td>
+<td style="text-align: center;">4.57</td>
+<td style="text-align: center;">3.95</td>
+<td style="text-align: center;">3.81</td>
+<td style="text-align: center;">4.21</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">29.03</td>
+<td style="text-align: center;">26.96</td>
+<td style="text-align: center;">35.67</td>
+<td style="text-align: center;">26.11</td>
+<td style="text-align: center;">31.73</td>
+<td style="text-align: center;">25.73</td>
+<td style="text-align: center;">23.53</td>
+<td style="text-align: center;">16.15</td>
+<td style="text-align: center;">14.49</td>
+<td style="text-align: center;">12.97</td>
+<td style="text-align: center;">11.39</td>
+</tr>
+</tbody>
+</table>
+<p>Table 1: Mean Absolute estimation Error (MAE) results for different
+datasets in our setup grouped by the nature of shift. ‘Same’ refers to
+same subpopulation shifts and ‘Novel’ refers novel subpopulation shifts.
+We include details about the target sets considered in each shift in
+Table 2. Post T denotes use of TS calibration on source. Across all
+datasets, we observe that ATC achieves superior performance (lower MAE
+is better). For language datasets, we use DistilBERT-base-uncased, for
+vision dataset we report results with DenseNet model with the exception
+of MNIST where we use FCN. We include results on other architectures in
+App. H. For GDE post T and pre T estimates match since TS doesn’t alter
+the argmax prediction. Results reported by aggregating MAE numbers over
+4 different seeds. We include results with standard deviation values in
+Table 3.</p>
+<p>Average Confidence (AC). Error is estimated as the expected value of
+the maximum softmax confidence on the target data, i.e, <span class="math inline">\(\mathrm{AC}_{\mathcal{D}^{\dagger}}=\mathbb{E}_{x
+\sim \mathcal{D}^{\dagger}}\left[\max _{j \in \mathcal{Y}}
+f_{j}(x)\right]\)</span>. Difference Of Confidence (DOC). We estimate
+error on target by subtracting difference of confidences on source and
+target (as a surrogate to distributional distance Guillory et
+al. (2021)) from the error on source distribution, i.e, <span class="math inline">\(\mathrm{DOC}_{\mathcal{D}^{\dagger}}=\mathbb{E}_{x
+\sim \mathcal{D}^{\delta}}\left[\mathbb{I}\left[\arg \max _{j \in
+\mathcal{Y}} f_{j}(x) \neq y\right]\right]+\mathbb{E}_{x \sim
+\mathcal{D}^{\dagger}}\left[\max _{j \in \mathcal{Y}}
+f_{j}(x)\right]-\)</span> <span class="math inline">\(\mathbb{E}_{x \sim
+\mathcal{D}^{\delta}}\left[\max _{j \in \mathcal{Y}}
+f_{j}(x)\right]\)</span>. This is referred to as DOC-Feat in (Guillory
+et al., 2021). Importance re-weighting (IM). We estimate the error of
+the classifier with importance re-weighting of <span class="math inline">$0-1$</span> error in the pushforward space of the
+classifier. This corresponds to MANDOLIN using one slice based on the
+underlying classifier confidence Chen et al. (2021b).</p>
+<p>Generalized Disagreement Equality (GDE). Error is estimated as the
+expected disagreement of two models (trained on the same training set
+but with different randomization) on target data (Jiang et al., 2021),
+i.e., <span class="math inline">\(\operatorname{GDE}_{\mathcal{D}^{\dagger}}=\mathbb{E}_{x
+\sim \mathcal{D}^{\dagger}}\left[\mathbb{I}\left[f(x) \neq
+f^{\prime}(x)\right]\right]\)</span> where <span class="math inline">$f$</span> and <span class="math inline">$f^{\prime}$</span> are the two models. Note that
+GDE requires two models trained independently, doubling the
+computational overhead while training.</p>
+<h3 id="results">5.1 RESULTS</h3>
+<p>In Table 1, we report MAE results aggregated by the nature of the
+shift in our testbed. In Fig. 2 and Fig. 1(right), we show scatter plots
+for predicted accuracy versus OOD accuracy on several datasets. We
+include scatter plots for all datasets and parallel results with other
+architectures in App. H. In App. H.1, we also perform ablations on CIFAR
+using a pre-trained model and observe that pre-training doesn’t change
+the efficacy of ATC.</p>
+<figure>
+<img alt="img-2.jpeg" src="img-2.jpeg"/>
+<figcaption aria-hidden="true">img-2.jpeg</figcaption>
+</figure>
+<p>Figure 3: Left: Predicted accuracy with DOC on Living17 BreEds
+dataset. We observe a substantial gap in the linear fit of same and
+different subpopulations highlighting poor correlation. Middle: After
+fitting a robust linear model for DOC on same subpopulation, we show
+predicted accuracy on different subpopulations with fine-tuned DOC
+(i.e., <span class="math inline">\(\operatorname{DOC}(\mathrm{w} /
+\mathrm{fit})\)</span> ) and compare with ATC without any regression
+model, i.e., ATC (w/o fit). While observe substantial improvements in
+MAE from 24.41 with DOC (w/o fit) to 13.26 with DOC (w/ fit), ATC (w/o
+fit) continues to outperform even DOC (w/ fit) with MAE 10.22. We show
+parallel results with other BREEDS datasets in App. H.2. Right :
+Empirical validation of our toy model. We show that ATC perfectly
+estimates target performance as we vary the degree of spurious
+correlation in target. ’ <span class="math inline">$\times$</span> ’
+represents accuracy on source.</p>
+<p>We predict accuracy on the target data before and after calibration
+with TS. First, we observe that both ATC-NE and ATC-MC (even without TS)
+obtain significantly lower MAE when compared with other methods (even
+with TS). Note that with TS we observe substantial improvements in MAE
+for all methods. Overall, ATC-NE (with TS) typically achieves the
+smallest MAE improving by more than <span class="math inline">\(2
+\times\)</span> on CIFAR and by <span class="math inline">\(3-4
+\times\)</span> on ImageNet over GDE (the next best alternative to ATC).
+Alongside, we also observe that a linear fit with robust regression
+(Siegel, 1982) on the scatter plot recovers a line close to <span class="math inline">$x=y$</span> for ATC-NE with TS while the line is
+far away from <span class="math inline">$x=y$</span> for other methods
+(Fig. 2 and Fig. 1(right)). Remarkably, MAE is in the range of <span class="math inline">$0.4-5.8$</span> with ATC for CIFAR, ImageNet,
+MNIST, and Wilds. However, MAE is much higher on BREEDS benchmark with
+novel subpopulations. While we observe a small MAE (i.e., comparable to
+our observations on other datasets) on BREEDS with natural and synthetic
+shifts from the same sub-population, MAE on shifts with novel population
+is significantly higher with all methods. Note that even on novel
+populations, ATC continues to dominate all other methods across all
+datasets in BREEDS. Additionally, for different subpopulations in BREEDS
+setup, we observe a poor linear correlation of the estimated performance
+with the actual performance as shown in Fig. 3 (left)(we notice a
+similar gap in the linear fit for all other methods). Hence in such a
+setting, we would expect methods that fine-tune a regression model on
+labeled target examples from shifts with one subpopulation will perform
+poorly on shifts with different subpopulations. Corroborating this
+intuition, next, we show that even after fitting a regression model for
+DOC on natural and synthetic shifts with source subpopulations, ATC
+without regression model continues to outperform DOC with regression
+model on shifts with novel subpopulation.</p>
+<p>Fitting a regression model on BREEDS with DOC. Using label target
+data from natural and synthetic shifts for the same subpopulation (same
+as source), we fit a robust linear regression model (Siegel, 1982) to
+fine-tune DOC as in Guillory et al. (2021). We then evaluate the
+fine-tuned DOC (i.e., DOC with linear model) on natural and synthetic
+shifts from novel subpopulations on BREEDS benchmark. Although we
+observe significant improvements in the performance of finetuned DOC
+when compared with DOC (without any fine-tuning), ATC without any
+regression model continues to perform better (or similar) to that of
+fine-tuned DOC on novel subpopulations (Fig. 3 (middle)). Refer to App.
+H. 2 for details and Table 5 for MAE on BREEDS with regression
+model.</p>
+<h2 id="investigating-atc-on-toy-model">6 InVEStigating ATC on Toy
+Model</h2>
+<p>In this section, we propose and analyze a simple theoretical model
+that distills empirical phenomena from the previous section and
+highlights efficacy of ATC. Here, our aim is not to obtain a general
+model that captures complicated real distributions on high dimensional
+input space as the images in ImageNet. Instead to further our
+understanding, we focus on an easy-to-learn binary classification task
+from Nagarajan et al. (2020) with linear classifiers, that is rich
+enough to exhibit some of the same phenomena as with deep networks on
+real data distributions.</p>
+<p>Consider a easy-to-learn binary classification problem with two
+features <span class="math inline">\$x=\left[x_{\text {inv }}, x_{\text
+{sp }}\right] \in \mathbb{R}^{2}\$</span> where <span class="math inline">$x_{\text {inv }}$</span> is fully predictive
+invariant feature with a margin <span class="math inline">$\gamma&gt;0$</span> and <span class="math inline">$x_{\text {sp }} \in\{-1,1\}$</span> is a spurious
+feature (i.e., a feature that is correlated but not predictive of the
+true label). Conditional on <span class="math inline">$y$</span>, the
+distribution over <span class="math inline">$x_{\text {inv }}$</span>
+is given as follows: <span class="math inline">\(x_{\text {inv }}
+\mid$y=1$ \sim U[\gamma, c]\)</span> and <span class="math inline">\(x_{\text {inv }} \mid$y=0$ \sim
+U[-c,-\gamma]\)</span>, where <span class="math inline">$c$</span> is
+a fixed constant greater than <span class="math inline">$\gamma$</span>. For simplicity, we assume that
+label distribution on source is uniform on <span class="math inline">$\{-1,1\}$</span>. <span class="math inline">$x_{\text {sp }}$</span> is distributed such that
+<span class="math inline">\(P_{x}\left[x_{\text {sp }} \cdot(2
+y-1)&gt;0\right]=p_{\text {sp }}\)</span>, where <span class="math inline">$p_{\text {sp }} \in(0.5,1.0)$</span> controls the
+degree of spurious correlation. To model distribution shift, we simulate
+target data with different degree of spurious correlation, i.e., in
+target distribution <span class="math inline">\(P_{t}\left[x_{\text {sp
+}} \cdot(2 y-1)&gt;0\right]=p_{\text {sp }}^{\prime} \in[0,1]\)</span>.
+Note that here we do not consider shifts in the label distribution but
+our result extends to arbitrary shifts in the label distribution as
+well.</p>
+<p>In this setup, we examine linear sigmoid classifiers of the form
+<span class="math inline">\(f(x)=\left[\frac{1}{1+e^{w^{T} x}},
+\frac{e^{w^{T} x}}{1+e^{w^{T} x}}\right]\)</span> where <span class="math inline">\$w=\left[w_{\text {inv }}, w_{\text {sp }}\right]
+\in \mathbb{R}^{2}\$</span>. While there exists a linear classifier with
+<span class="math inline">$w=[1,0]$</span> that correctly classifies
+all the points with a margin <span class="math inline">$\gamma$</span>, Nagarajan et al. (2020)
+demonstrated that a linear classifier will typically have a dependency
+on the spurious feature, i.e., <span class="math inline">\(w_{\text {sp
+}} \neq 0\)</span>. They show that due to geometric skews, despite
+having positive dependencies on the invariant feature, a max-margin
+classifier trained on finite samples relies on the spurious feature.
+Refer to App. D for more details on these skews. In our work, we show
+that given a linear classifier that relies on the spurious feature and
+achieves a non-trivial performance on the source (i.e., <span class="math inline">$w_{\text {inv }}&gt;0$</span> ), ATC with maximum
+confidence score function consistently estimates the accuracy on the
+target distribution. Theorem 1 (Informal). Given any classifier with
+<span class="math inline">$w_{\text {inv }}&gt;0$</span> in the above
+setting, the threshold obtained in (1) together with ATC as in (2) with
+maximum confidence score function obtains a consistent estimate of the
+target accuracy.</p>
+<p>Consider a classifier that depends positively on the spurious feature
+(i.e., <span class="math inline">$w_{\text {sp }}&gt;0$</span> ). Then
+as the spurious correlation decreases in the target data, the classifier
+accuracy on the target will drop and vice-versa if the spurious
+correlation increases on the target data. Theorem 1 shows that the
+threshold identified with ATC as in (1) remains invariant as the
+distribution shifts and hence ATC as in (2) will correctly estimate the
+accuracy with shifting distributions. Next, we illustrate Theorem 1 by
+simulating the setup empirically. First we pick a arbitrary classifier
+(which can also be obtained by training on source samples), tune the
+threshold on hold-out source examples and predict accuracy with
+different methods as we shift the distribution by varying the degree of
+spurious correlation. Empirical validation and comparison with other
+methods. Fig. 3(right) shows that as the degree of spurious correlation
+varies, our method accurately estimates the target performance where all
+other methods fail to accurately estimate the target performance.
+Understandably, due to poor calibration of the sigmoid linear classifier
+AC, DOC and GDE fail. While in principle IM can perfectly estimate the
+accuracy on target in this case, we observe that it is highly sensitive
+to the number bins and choice of histogram binning (i.e., uniform mass
+or equal width binning). We elaborate more on this in App. D. Biased
+estimation with ATC. Now we discuss changes in the above setup where ATC
+yields inconsistent estimates. We assumed that both in source and target
+<span class="math inline">$x_{\text {inv }} \mid y=1$</span> is
+uniform between <span class="math inline">$[\gamma, c]$</span> and
+<span class="math inline">$x \mid y=-1$</span> is uniform between
+<span class="math inline">$[-c,-\gamma]$</span>. Shifting the support
+of target class conditional <span class="math inline">$p_{t}\left(x_{\text {inv }} \mid y\right)$</span>
+may introduce a bias in ATC estimates, e.g., shrinking the support to
+<span class="math inline">$c_{1}(&lt;c)$</span> (while maintaining
+uniform distribution) in the target will lead to an over-estimation of
+the target performance with ATC. In App. D.1, we elaborate on this
+failure and present a general (but less interpretable) classifier
+dependent distribution shift condition where ATC is guaranteed to yield
+consistent estimates.</p>
+<h1 id="conclusion-and-future-work">7 CONCLUSION AND FUTURE WORK</h1>
+<p>In this work, we proposed ATC, a simple method for estimating target
+domain accuracy based on unlabeled target (and labeled source data). ATC
+achieves remarkably low estimation error on several synthetic and
+natural shift benchmarks in our experiments. Notably, our work draws
+inspiration from recent state-of-the-art methods that use softmax
+confidences below a certain threshold for OOD detection (Hendrycks &amp;
+Gimpel, 2016; Hendrycks et al., 2019) and takes a step forward in
+answering questions raised in Deng &amp; Zheng (2021) about the
+practicality of threshold based methods. Our distribution shift toy
+model justifies ATC on an easy-to-learn binary classification task. In
+our experiments, we also observe that calibration significantly improves
+estimation with ATC. Since in binary classification, post hoc
+calibration with TS does not change the effective threshold, in future
+work, we hope to extend our theoretical model to multi-class
+classification to understand the efficacy</p>
+<p>of calibration. Our theory establishes that a classifier’s accuracy
+is not, in general identified, from labeled source and unlabeled target
+data alone, absent considerable additional constraints on the target
+conditional <span class="math inline">$p_{t}(y \mid x)$</span>. In
+light of this finding, we also hope to extend our understanding beyond
+the simple theoretical toy model to characterize broader sets of
+conditions under which ATC might be guaranteed to obtain consistent
+estimates. Finally, we should note that while ATC outperforms previous
+approaches, it still suffers from large estimation error on datasets
+with novel populations, e.g., BREEDS. We hope that our findings can lay
+the groundwork for future work for improving accuracy estimation on such
+datasets.</p>
+<p>Reproducibility Statement Our code to reproduce all the results is
+available at https:// github.com/saurabhgarg1996/ATC_code. We have been
+careful to ensure that our results are reproducible. We have stored all
+models and logged all hyperparameters and seeds to facilitate
+reproducibility. Note that throughout our work, we do not perform any
+hyperparameter tuning, instead, using benchmarked hyperparameters and
+training procedures to make our results easy to reproduce. While, we
+have not released code yet, the appendix provides all the necessary
+details to replicate our experiments and results.</p>
+<h1 id="acknowledgement">ACKNOWLEDGEMENT</h1>
+<p>Authors would like to thank Ariel Kleiner and Sammy Jerome as the
+problem formulation and motivation of this paper was highly influenced
+by initial discussions with them.</p>
+<h2 id="references">REFERENCES</h2>
+<p>Amr Alexandari, Anshul Kundaje, and Avanti Shrikumar. Adapting to
+label shift with bias-corrected calibration. In arXiv preprint
+arXiv:1901.06852, 2019.</p>
+<p>Kamyar Azizzadenesheli, Anqi Liu, Fanny Yang, and Animashree
+Anandkumar. Regularized learning for domain adaptation under label
+shifts. In International Conference on Learning Representations (ICLR),
+2019.</p>
+<p>Peter L Bartlett, Dylan J Foster, and Matus J Telgarsky.
+Spectrally-normalized margin bounds for neural networks. In Advances in
+neural information processing systems, pp. 6240-6249, 2017.</p>
+<p>Shai Ben-David, Tyler Lu, Teresa Luu, and Dávid Pál. Impossibility
+Theorems for Domain Adaptation. In International Conference on
+Artificial Intelligence and Statistics (AISTATS), 2010.</p>
+<p>Daniel Borkan, Lucas Dixon, Jeffrey Sorensen, Nithum Thain, and Lucy
+Vasserman. Nuanced metrics for measuring unintended bias with real data
+for text classification. In Companion Proceedings of The 2019 World Wide
+Web Conference, 2019.</p>
+<p>Jiefeng Chen, Frederick Liu, Besim Avci, Xi Wu, Yingyu Liang, and
+Somesh Jha. Detecting errors and estimating accuracy on unlabeled data
+with self-training ensembles. Advances in Neural Information Processing
+Systems, 34:14980-14992, 2021a.</p>
+<p>Mayee Chen, Karan Goel, Nimit S Sohoni, Fait Poms, Kayvon Fatahalian,
+and Christopher Ré. Mandoline: Model evaluation under distribution
+shift. In International Conference on Machine Learning, pp. 1617-1629.
+PMLR, 2021b.</p>
+<p>Gordon Christie, Neil Fendley, James Wilson, and Ryan Mukherjee.
+Functional map of the world. In Proceedings of the IEEE Conference on
+Computer Vision and Pattern Recognition, 2018.</p>
+<p>Ching-Yao Chuang, Antonio Torralba, and Stefanie Jegelka. Estimating
+generalization under distribution shifts via domain-invariant
+representations. arXiv preprint arXiv:2007.03511, 2020.</p>
+<p>Weijian Deng and Liang Zheng. Are labels always necessary for
+classifier accuracy evaluation? In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition, pp. <span class="math inline">$15069-15078,2021$</span>.</p>
+<p>Weijian Deng, Stephen Gould, and Liang Zheng. What does rotation
+prediction tell us about classifier accuracy under varying testing
+environments? arXiv preprint arXiv:2106.05961, 2021.</p>
+<p>Gintare Karolina Dziugaite and Daniel M Roy. Computing nonvacuous
+generalization bounds for deep (stochastic) neural networks with many
+more parameters than training data. arXiv preprint arXiv:1703.11008,
+2017.</p>
+<p>Saurabh Garg, Yifan Wu, Sivaraman Balakrishnan, and Zachary C Lipton.
+A unified view of label shift estimation. arXiv preprint
+arXiv:2003.07554, 2020.</p>
+<p>Saurabh Garg, Sivaraman Balakrishnan, J Zico Kolter, and Zachary C
+Lipton. Ratt: Leveraging unlabeled data to guarantee generalization.
+arXiv preprint arXiv:2105.00303, 2021.</p>
+<p>Yonatan Geifman and Ran El-Yaniv. Selective classification for deep
+neural networks. arXiv preprint arXiv:1705.08500, 2017.</p>
+<p>Devin Guillory, Vaishaal Shankar, Sayna Ebrahimi, Trevor Darrell, and
+Ludwig Schmidt. Predicting with confidence on unseen distributions.
+arXiv preprint arXiv:2107.03315, 2021.</p>
+<p>Chuan Guo, Geoff Pleiss, Yu Sun, and Kilian Q Weinberger. On
+calibration of modern neural networks. In International Conference on
+Machine Learning (ICML), 2017.</p>
+<p>Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep Residual
+Learning for Image Recognition. In Computer Vision and Pattern
+Recognition (CVPR), 2016.</p>
+<p>James J Heckman. Sample Selection Bias as a Specification Error (With
+an Application to the Estimation of Labor Supply Functions), 1977.</p>
+<p>Dan Hendrycks and Thomas Dietterich. Benchmarking neural network
+robustness to common corruptions and perturbations. arXiv preprint
+arXiv:1903.12261, 2019.</p>
+<p>Dan Hendrycks and Kevin Gimpel. A baseline for detecting
+misclassified and out-of-distribution examples in neural networks. arXiv
+preprint arXiv:1610.02136, 2016.</p>
+<p>Dan Hendrycks, Steven Basart, Mantas Mazeika, Mohammadreza Mostajabi,
+Jacob Steinhardt, and Dawn Song. Scaling out-of-distribution detection
+for real-world settings. arXiv preprint arXiv:1911.11132, 2019.</p>
+<p>Dan Hendrycks, Steven Basart, Norman Mu, Saurav Kadavath, Frank Wang,
+Evan Dorundo, Rahul Desai, Tyler Zhu, Samyak Parajuli, Mike Guo, Dawn
+Song, Jacob Steinhardt, and Justin Gilmer. The many faces of robustness:
+A critical analysis of out-of-distribution generalization. ICCV,
+2021.</p>
+<p>Gao Huang, Zhuang Liu, Laurens Van Der Maaten, and Kilian Q
+Weinberger. Densely connected convolutional networks. In Proceedings of
+the IEEE conference on computer vision and pattern recognition,
+pp. 4700-4708, 2017.</p>
+<p>Jonathan J. Hull. A database for handwritten text recognition
+research. IEEE Transactions on pattern analysis and machine
+intelligence, 16(5):550-554, 1994.</p>
+<p>Xu Ji, Razvan Pascanu, Devon Hjelm, Andrea Vedaldi, Balaji
+Lakshminarayanan, and Yoshua Bengio. Predicting unreliable predictions
+by shattering a neural network. arXiv preprint arXiv:2106.08365,
+2021.</p>
+<p>Heinrich Jiang, Been Kim, Melody Y Guan, and Maya R Gupta. To trust
+or not to trust a classifier. In NeurIPS, pp. 5546-5557, 2018.</p>
+<p>Yiding Jiang, Vaishnavh Nagarajan, Christina Baek, and J Zico Kolter.
+Assessing generalization of sgd via disagreement. arXiv preprint
+arXiv:2106.13799, 2021.</p>
+<p>Diederik P Kingma and Jimmy Ba. Adam: A Method for Stochastic
+Optimization. arXiv Preprint arXiv:1412.6980, 2014.</p>
+<p>Pang Wei Koh, Shiori Sagawa, Henrik Marklund, Sang Michael Xie,
+Marvin Zhang, Akshay Balsubramani, Weihua Hu, Michihiro Yasunaga,
+Richard Lanas Phillips, Irena Gao, Tony Lee, Etienne David, Ian
+Stavness, Wei Guo, Berton A. Earnshaw, Imran S. Haque, Sara Beery, Jure
+Leskovec, Anshul Kundaje, Emma Pierson, Sergey Levine, Chelsea Finn, and
+Percy Liang. WILDS: A benchmark of in-the-wild distribution shifts. In
+International Conference on Machine Learning (ICML), 2021.</p>
+<p>Alex Krizhevsky and Geoffrey Hinton. Learning Multiple Layers of
+Features from Tiny Images. Technical report, Citeseer, 2009.</p>
+<p>Balaji Lakshminarayanan, Alexander Pritzel, and Charles Blundell.
+Simple and scalable predictive uncertainty estimation using deep
+ensembles. arXiv preprint arXiv:1612.01474, 2016.</p>
+<p>Yann LeCun, Léon Bottou, Yoshua Bengio, and Patrick Haffner.
+Gradient-Based Learning Applied to Document Recognition. Proceedings of
+the IEEE, 86, 1998.</p>
+<p>Shiyu Liang, Yixuan Li, and Rayadurgam Srikant. Enhancing the
+reliability of out-of-distribution image detection in neural networks.
+arXiv preprint arXiv:1706.02690, 2017.</p>
+<p>Zachary C Lipton, Yu-Xiang Wang, and Alex Smola. Detecting and
+Correcting for Label Shift with Black Box Predictors. In International
+Conference on Machine Learning (ICML), 2018.</p>
+<p>Philip M Long and Hanie Sedghi. Generalization bounds for deep
+convolutional neural networks. arXiv preprint arXiv:1905.12600,
+2019.</p>
+<p>Ilya Loshchilov and Frank Hutter. Decoupled weight decay
+regularization. arXiv preprint arXiv:1711.05101, 2017.</p>
+<p>Vaishnavh Nagarajan and J Zico Kolter. Deterministic pac-bayesian
+generalization bounds for deep networks via generalizing
+noise-resilience. arXiv preprint arXiv:1905.13344, 2019a.</p>
+<p>Vaishnavh Nagarajan and J Zico Kolter. Uniform convergence may be
+unable to explain generalization in deep learning. In Advances in Neural
+Information Processing Systems, pp. 11615-11626, 2019b.</p>
+<p>Vaishnavh Nagarajan, Anders Andreassen, and Behnam Neyshabur.
+Understanding the failure modes of out-of-distribution generalization.
+arXiv preprint arXiv:2010.15775, 2020.</p>
+<p>Yuval Netzer, Tao Wang, Adam Coates, Alessandro Bissacco, Bo Wu, and
+Andrew Y Ng. Reading digits in natural images with unsupervised feature
+learning. In Advances in Neural Information Processing Systems (NIPS),
+2011.</p>
+<p>Behnam Neyshabur. Implicit regularization in deep learning. arXiv
+preprint arXiv:1709.01953, 2017. Behnam Neyshabur, Ryota Tomioka, and
+Nathan Srebro. Norm-based capacity control in neural networks. In
+Conference on Learning Theory, pp. 1376-1401, 2015.</p>
+<p>Behnam Neyshabur, Srinadh Bhojanapalli, David McAllester, and Nathan
+Srebro. Exploring generalization in deep learning. arXiv preprint
+arXiv:1706.08947, 2017.</p>
+<p>Behnam Neyshabur, Zhiyuan Li, Srinadh Bhojanapalli, Yann LeCun, and
+Nathan Srebro. The role of over-parametrization in generalization of
+neural networks. In International Conference on Learning
+Representations, 2018.</p>
+<p>Jianmo Ni, Jiacheng Li, and Julian McAuley. Justifying
+recommendations using distantly-labeled reviews and fine-grained
+aspects. In Proceedings of the 2019 Conference on Empirical Methods in
+Natural Language Processing and the 9th International Joint Conference
+on Natural Language Processing (EMNLP-IJCNLP), 2019.</p>
+<p>Yaniv Ovadia, Emily Fertig, Jie Ren, Zachary Nado, David Sculley,
+Sebastian Nowozin, Joshua V Dillon, Balaji Lakshminarayanan, and Jasper
+Snoek. Can you trust your model’s uncertainty? evaluating predictive
+uncertainty under dataset shift. arXiv preprint arXiv:1906.02530,
+2019.</p>
+<p>Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury,
+Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca
+Antiga, Alban Desmaison, Andreas Kopf, Edward Yang, Zachary DeVito,
+Martin Raison, Alykhan Tejani, Sasank Chilamkurthy, Benoit Steiner, Lu
+Fang, Junjie Bai, and Soumith Chintala. Pytorch: An imperative style,
+high-performance deep learning library. In Advances in Neural
+Information Processing Systems 32, 2019.</p>
+<p>Emmanouil A Platanios, Hoifung Poon, Tom M Mitchell, and Eric
+Horvitz. Estimating accuracy from unlabeled data: A probabilistic logic
+approach. arXiv preprint arXiv:1705.07086, 2017.</p>
+<p>Emmanouil Antonios Platanios, Avinava Dubey, and Tom Mitchell.
+Estimating accuracy from unlabeled data: A bayesian approach. In
+International Conference on Machine Learning, pp. 1416-1425. PMLR,
+2016.</p>
+<p>Stephan Rabanser, Stephan Günnemann, and Zachary C Lipton. Failing
+loudly: An empirical study of methods for detecting dataset shift. arXiv
+preprint arXiv:1810.11953, 2018.</p>
+<p>Aaditya Ramdas, Sashank Jakkam Reddi, Barnabás Póczos, Aarti Singh,
+and Larry A Wasserman. On the Decreasing Power of Kernel and Distance
+Based Nonparametric Hypothesis Tests in High Dimensions. In Association
+for the Advancement of Artificial Intelligence (AAAI), 2015.</p>
+<p>Benjamin Recht, Rebecca Roelofs, Ludwig Schmidt, and Vaishaal
+Shankar. Do cifar-10 classifiers generalize to cifar-10? arXiv preprint
+arXiv:1806.00451, 2018.</p>
+<p>Benjamin Recht, Rebecca Roelofs, Ludwig Schmidt, and Vaishaal
+Shankar. Do imagenet classifiers generalize to imagenet? In
+International Conference on Machine Learning, pp. 5389-5400. PMLR,
+2019.</p>
+<p>Mateo Rojas-Carulla, Bernhard Schölkopf, Richard Turner, and Jonas
+Peters. Invariant models for causal transfer learning. The Journal of
+Machine Learning Research, 19(1):1309-1342, 2018.</p>
+<p>Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, Sanjeev
+Satheesh, Sean Ma, Zhiheng Huang, Andrej Karpathy, Aditya Khosla,
+Michael Bernstein, et al. Imagenet large scale visual recognition
+challenge. International journal of computer vision, 115(3):211-252,
+2015.</p>
+<p>Marco Saerens, Patrice Latinne, and Christine Decaestecker. Adjusting
+the Outputs of a Classifier to New a Priori Probabilities: A Simple
+Procedure. Neural Computation, 2002.</p>
+<p>Victor Sanh, Lysandre Debut, Julien Chaumond, and Thomas Wolf.
+Distilbert, a distilled version of bert: smaller, faster, cheaper and
+lighter. ArXiv, abs/1910.01108, 2019.</p>
+<p>Shibani Santurkar, Dimitris Tsipras, and Aleksander Madry. Breeds:
+Benchmarks for subpopulation shift. arXiv preprint arXiv:2008.04859,
+2020.</p>
+<p>Hidetoshi Shimodaira. Improving Predictive Inference Under Covariate
+Shift by Weighting the Log-Likelihood Function. Journal of Statistical
+Planning and Inference, 2000.</p>
+<p>Andrew F Siegel. Robust regression using repeated medians.
+Biometrika, 69(1):242-244, 1982. Christian Szegedy, Wojciech Zaremba,
+Ilya Sutskever, Joan Bruna, Dumitru Erhan, Ian Goodfellow, and Rob
+Fergus. Intriguing Properties of Neural Networks. In International
+Conference on Learning Representations (ICLR), 2014.</p>
+<p>Remi Tachet des Combes, Han Zhao, Yu-Xiang Wang, and Geoffrey J
+Gordon. Domain adaptation with conditional distribution matching and
+generalized label shift. Advances in Neural Information Processing
+Systems, 33, 2020. J. Taylor, B. Earnshaw, B. Mabey, M. Victors, and J.
+Yosinski. Rxrx1: An image set for cellular morphological variation
+across many experimental batches. In International Conference on
+Learning Representations (ICLR), 2019.</p>
+<p>Antonio Torralba, Rob Fergus, and William T. Freeman. 80 million tiny
+images: A large data set for nonparametric object and scene recognition.
+IEEE Transactions on Pattern Analysis and Machine Intelligence,
+30(11):1958-1970, 2008.</p>
+<p>Haohan Wang, Songwei Ge, Zachary Lipton, and Eric P Xing. Learning
+robust global representations by penalizing local predictive power. In
+Advances in Neural Information Processing Systems, pp. 10506-10518,
+2019.</p>
+<p>Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement
+Delangue, Anthony Moi, Pierric Cistac, Tim Rault, Rémi Louf, Morgan
+Funtowicz, Joe Davison, Sam Shleifer, Patrick von Platen, Clara Ma,
+Yacine Jernite, Julien Plu, Canwen Xu, Teven Le Scao, Sylvain Gugger,
+Mariama Drame, Quentin Lhoest, and Alexander M. Rush. Transformers:
+State-of-the-art natural language processing. In Proceedings of the 2020
+Conference on Empirical Methods in Natural Language Processing: System
+Demonstrations, pp. 38-45. Association for Computational Linguistics,
+2020.</p>
+<p>Chhavi Yadav and Léon Bottou. Cold case: The lost mnist digits. In
+Advances in Neural Information Processing Systems 32, 2019.</p>
+<p>Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol
+Vinyals. Understanding deep learning requires rethinking generalization.
+arXiv preprint arXiv:1611.03530, 2016.</p>
+<p>Hongjie Zhang, Ang Li, Jie Guo, and Yanwen Guo. Hybrid models for
+open set recognition. In European Conference on Computer Vision,
+pp. 102-117. Springer, 2020.</p>
+<p>Kun Zhang, Bernhard Schölkopf, Krikamol Muandet, and Zhikun Wang.
+Domain Adaptation Under Target and Conditional Shift. In International
+Conference on Machine Learning (ICML), 2013.</p>
+<p>Wenda Zhou, Victor Veitch, Morgane Austern, Ryan P Adams, and Peter
+Orbanz. Non-vacuous generalization bounds at the imagenet scale: a
+pac-bayesian compression approach. arXiv preprint arXiv:1804.05862,
+2018.</p>
+<h1 id="appendix">APPENDIX</h1>
+<h2 id="a-proofs-from-sec.-3">A Proofs from Sec. 3</h2>
+<p>Before proving results from Sec. 3, we introduce some notations.
+Define <span class="math inline">$\mathcal{E}(f(x), y):=$</span> <span class="math inline">\(\mathbb{I}\left[y \notin \arg \max _{j \in
+\mathcal{Y}} f_{j}(x)\right]\)</span>. We express the population error
+on distribution <span class="math inline">$\mathcal{D}$</span> as
+<span class="math inline">$\mathcal{E}_{\mathcal{D}}(f):=$</span>
+<span class="math inline">\(\mathbb{E}_{(x, y) \sim
+\mathcal{D}}[\mathcal{E}(f(x), y)]\)</span></p>
+<p>Proof of Proposition 1. Consider a binary classification problem.
+Assume <span class="math inline">$\mathcal{P}$</span> be the set of
+possible target conditional distribution of labels given <span class="math inline">$p_{s}(x, y)$</span> and <span class="math inline">$p_{t}(x)$</span>. The forward direction is
+simple. If <span class="math inline">\$\mathcal{P}=\left\{p_{t}(y \mid
+x$\right\}\)</span> is singleton given <span class="math inline">$p_{s}(x, y)$</span> and <span class="math inline">$p_{t}(x)$</span>, then the error of any
+classifier <span class="math inline">$f$</span> on the target domain
+is identified and is given by</p>
+<p><span class="math display">\[
+\mathcal{E}_{\mathcal{D}^{T}}(f)=\mathbb{E}_{x \sim p_{t}(x), y \sim
+p_{t}(y \mid x)}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}}
+f_{j}(x) \neq y\right]\right]
+\]</span></p>
+<p>For the reverse direction assume that given <span class="math inline">$p_{t}(x)$</span> and <span class="math inline">$p_{s}(x, y)$</span>, we have two possible
+distributions <span class="math inline">$\mathcal{D}^{T}$</span> and
+<span class="math inline">$\mathcal{D}^{T^{\prime}}$</span> with <span class="math inline">\(p_{t}(y \mid x), p_{t}^{\prime}(y \mid x) \in
+\mathcal{P}\)</span> such that on some <span class="math inline">$x$</span> with <span class="math inline">$p_{t}(x)&gt;0$</span>, we have <span class="math inline">\(p_{t}(y \mid x) \neq p_{t}^{\prime}(y \mid
+x)\)</span>. Consider <span class="math inline">\(\mathcal{X}_{M}=\left\{x \in \mathcal{X} \mid
+p_{t}(x)&gt;0\right.\)</span> and <span class="math inline">\(p_{t}$y=1
+\mid x$ \neq p_{t}^{\prime}$y=1 \mid x$\}\)</span> be the set of all
+input covariates where the two distributions differ. We will now choose
+a classifier <span class="math inline">$f$</span> such that the error
+on the two distributions differ. On a subset <span class="math inline">\(\mathcal{X}_{M}^{1}=\left\{x \in \mathcal{X} \mid
+p_{t}(x)&gt;0\right.\)</span> and <span class="math inline">\(p_{t}$y=1
+\mid x$&gt;p_{t}^{\prime}$y=1 \mid x$\}\)</span>, assume <span class="math inline">$f(x)=0$</span> and on a subset <span class="math inline">\(\mathcal{X}_{M}^{2}=\left\{x \in \mathcal{X} \mid
+p_{t}(x)&gt;0\right.\)</span> and <span class="math inline">\(p_{t}$y=1
+\mid x$&lt;p_{t}^{\prime}$y=1 \mid x$\}\)</span>, assume <span class="math inline">$f(x)=1$</span>. We will show that the error of
+<span class="math inline">$f$</span> on distribution with <span class="math inline">$p_{t}(y \mid x)$</span> is strictly greater than
+the error of <span class="math inline">$f$</span> on distribution with
+<span class="math inline">$p_{t}^{\prime}(y \mid x)$</span>.
+Formally,</p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp;
+\mathcal{E}_{\mathcal{D}^{T}}(f)-\mathcal{E}_{\mathcal{D}^{T^{\prime}}}(f)
+\\
+&amp; =\mathbb{E}_{x \sim p_{t}(x), y \sim p_{t}(y \mid
+x)}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}} f_{j}(x) \neq
+y\right]\right]-\mathbb{E}_{x \sim p_{t}(x), y \sim p_{t}^{\prime}(y
+\mid x)}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}} f_{j}(x)
+\neq y\right]\right] \\
+&amp; =\int_{x \in \mathcal{X}_{M}} \mathbb{I}[f(x) \neq
+0]\left(p_{t}$y=0 \mid x$-p_{t}^{\prime}$y=0 \mid x$\right) p_{t}(x) d x
+\\
+&amp; \quad+\int_{x \in \mathcal{X}_{M}} \mathbb{I}[f(x) \neq
+1]\left(p_{t}$y=1 \mid x$-p_{t}^{\prime}$y=1 \mid x$\right) p_{t}(x) d x
+\\
+&amp; =\int_{x \in \mathcal{X}_{M}^{2}}\left(p_{t}$y=0 \mid
+x$-p_{t}^{\prime}$y=0 \mid x$\right) p_{t}(x) d x+\int_{x \in
+\mathcal{X}_{M}^{1}}\left(p_{t}$y=1 \mid x$-p_{t}^{\prime}$y=1 \mid
+x$\right) p_{t}(x) d x \\
+&amp; &gt;0
+\end{aligned}
+\]</span></p>
+<p>where the last step follows by construction of the set <span class="math inline">$\mathcal{X}_{M}^{1}$</span> and <span class="math inline">$\mathcal{X}_{M}^{2}$</span>. Since <span class="math inline">\(\mathcal{E}_{\mathcal{D}^{T}}(f) \neq
+\mathcal{E}_{\mathcal{D}^{T^{\prime}}}(f)\)</span>, given the
+information of <span class="math inline">$p_{t}(x)$</span> and <span class="math inline">$p_{s}(x, y)$</span> it is impossible to
+distinguish the two values of the error with classifier <span class="math inline">$f$</span>. Thus, we obtain a contradiction on the
+assumption that <span class="math inline">\(p_{t}(y \mid x) \neq
+p_{t}^{\prime}(y \mid x)\)</span>. Hence, we must pose restrictions on
+the nature of shift such that <span class="math inline">$\mathcal{P}$</span> is singleton to to identify
+accuracy on the target.</p>
+<p>Proof of Corollary 1. The corollary follows directly from Proposition
+1. Since two different target conditional distribution can lead to
+different error estimates without assumptions on the classifier, no
+method can estimate two different quantities from the same given
+information. We illustrate this in Example 1 next.</p>
+<h2 id="b-estimating-accuracy-in-covariate-shift-or-label-shift">B
+ESTIMATING ACCURACY IN COVARIATE SHIFT OR LABEL SHIFT</h2>
+<p>Accuracy estimation under covariate shift assumption Under the
+assumption that <span class="math inline">$p_{t}(y \mid x)=$</span>
+<span class="math inline">$p_{s}(y \mid x)$</span>, accuracy on the
+target domain can be estimated as follows:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathcal{E}_{\mathcal{D}^{T}}(f) &amp; =\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{T}}\left[\frac{p_{t}(x, y)}{p_{s}(x, y)} \mathbb{I}[f(x)
+\neq y]\right] \\
+&amp; =\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{T}}\left[\frac{p_{t}(x)}{p_{s}(x)} \mathbb{I}[f(x) \neq
+y]\right]
+\end{aligned}
+\]</span></p>
+<p>Given access to <span class="math inline">$p_{t}(x)$</span> and
+<span class="math inline">$p_{s}(x)$</span>, one can directly estimate
+the expression in (6). Accuracy estimation under label shift assumption
+Under the assumption that <span class="math inline">\(p_{t}(x \mid
+y)=p_{s}(x \mid y)\)</span>, accuracy on the target domain can be
+estimated as follows:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathcal{E}_{\mathcal{D}^{t}}(f) &amp; =\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{t}}\left[\frac{p_{t}(x, y)}{p_{s}(x, y)} \mathbb{I}[f(x)
+\neq y]\right] \\
+&amp; =\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{t}}\left[\frac{p_{t}(y)}{p_{s}(y)} \mathbb{I}[f(x) \neq
+y]\right]
+\end{aligned}
+\]</span></p>
+<p>Estimating importance ratios <span class="math inline">\(p_{t}(x) /
+p_{s}(x)\)</span> is straightforward under covariate shift assumption
+when the distributions <span class="math inline">$p_{t}(x)$</span> and
+<span class="math inline">$p_{s}(x)$</span> are known. For label
+shift, one can leverage moment matching approach called BBSE (Lipton et
+al., 2018) or likelihood minimization approach MLLS (Garg et al., 2020).
+Below we discuss the objective of MLLS:</p>
+<p><span class="math display">\[
+w=\underset{w \in \mathcal{W}}{\arg \max } \mathbb{E}_{x \sim
+p_{t}(x)}\left[\log p_{s}(y \mid x)^{T} w\right]
+\]</span></p>
+<p>where <span class="math inline">\$\mathcal{W}=\left\{w \mid \forall
+y, w_{y} \geqslant 0\right.\$</span> and <span class="math inline">\(\left.\sum_{y=1}^{k} w_{y}
+p_{s}(y)=1\right\}\)</span>. MLLS objective is guaranteed to obtain
+consistent estimates for the importance ratios <span class="math inline">$w^{*}(y)=p_{t}(y) / p_{s}(y)$</span> under the
+following condition. Theorem 2 (Theorem 1 (Garg et al., 2020)). If the
+distributions <span class="math inline">\(\{p(x) \mid y): y=1, \ldots,
+k\}\)</span> are strictly linearly independent, then <span class="math inline">$w^{*}$</span> is the unique maximizer of the MLLS
+objective (9). We refer interested reader to Garg et al. (2020) for
+details. Above results of accuracy estimation under label shift and
+covariate shift can be extended to a generalized label shift and
+covariate shift settings. Assume a function <span class="math inline">$h: \mathcal{X} \rightarrow \mathcal{Z}$</span>
+such that <span class="math inline">$y$</span> is independent of <span class="math inline">$x$</span> given <span class="math inline">$h(x)$</span>. In other words <span class="math inline">$h(x)$</span> contains all the information needed
+to predict label <span class="math inline">$y$</span>. With help of
+<span class="math inline">$h$</span>, we can extend estimation to
+following settings: (i) Generalized covariate shift, i.e., <span class="math inline">$p_{s}(y \mid h(x))=p_{t}(y \mid h(x))$</span> and
+<span class="math inline">$p_{s}(h(x))&gt;0$</span> for all <span class="math inline">$x \in \mathcal{X}_{t}$</span>; (ii) Generalized
+label shift, i.e., <span class="math inline">\(p_{s}(h(x) \mid
+y)=p_{t}(h(x) \mid y)\)</span> and <span class="math inline">$p_{s}(y)&gt;0$</span> for all <span class="math inline">$y \in \mathcal{Y}_{t}$</span>. By simply
+replacing <span class="math inline">$x$</span> with <span class="math inline">$h(x)$</span> in (6) and (9), we will obtain
+consistent error estimates under these generalized conditions.</p>
+<p>Proof of Example 1. Under covariate shift using (6), we get</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathcal{E}_{1} &amp; =\mathbb{E}_{(x, y) \sim p_{s}(x,
+y)}\left[\frac{p_{t}(x)}{p_{s}(x)} \mathbb{I}[f(x) \neq y]\right] \\
+&amp; =\mathbb{E}_{x \sim p_{s}$x, y=0$}\left[\frac{p_{t}(x)}{p_{s}(x)}
+\mathbb{I}[f(x) \neq 0]\right]+\mathbb{E}_{x \sim p_{s}$x,
+y=1$}\left[\frac{p_{t}(x)}{p_{s}(x)} \mathbb{I}[f(x) \neq 1]\right] \\
+&amp; =\int \mathbb{I}[f(x) \neq 0] p_{t}(x) p_{s}$y=0 \mid x$ d x+\int
+\mathbb{I}[f(x) \neq 1] p_{t}(x) p_{s}$y=1 \mid x$ d x
+\end{aligned}
+\]</span></p>
+<p>Under label shift using (8), we get</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathcal{E}_{2} &amp; =\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{t}}\left[\frac{p_{t}(y)}{p_{s}(y)} \mathbb{I}[f(x) \neq
+y]\right] \\
+&amp; =\mathbb{E}_{x \sim p_{s}$x, y=0$}\left[\frac{\beta}{\alpha}
+\mathbb{I}[f(x) \neq 0]\right]+\mathbb{E}_{x \sim p_{s}$x,
+y=1$}\left[\frac{1-\beta}{1-\alpha} \mathbb{I}[f(x) \neq 1]\right] \\
+&amp; =\int \mathbb{I}[f(x) \neq 0] \frac{\beta}{\alpha} p_{s}$y=0 \mid
+x$ p_{s}(x) d x+\int \mathbb{I}[f(x) \neq 1]
+\frac{(1-\beta)}{(1-\alpha)} p_{s}$y=1 \mid x$ p_{s}(x) d x
+\end{aligned}
+\]</span></p>
+<p>Then <span class="math inline">$\mathcal{E}_{1}-\mathcal{E}_{2}$</span> is given
+by</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathcal{E}_{1}-\mathcal{E}_{2} &amp; =\int \mathbb{I}[f(x) \neq 0]
+p_{s}$y=0 \mid x$\left[p_{t}(x)-\frac{\beta}{\alpha} p_{s}(x)\right] d x
+\\
+&amp; +\int \mathbb{I}[f(x) \neq 1] p_{s}$y=1 \mid
+x$\left[p_{t}(x)-\frac{(1-\beta)}{(1-\alpha)} p_{s}(x)\right] d x \\
+&amp; =\int \mathbb{I}[f(x) \neq 0] p_{s}$y=0 \mid x$
+\frac{(\alpha-\beta)}{\alpha} \phi\left(\mu_{2}\right) d x \\
+&amp; +\int \mathbb{I}[f(x) \neq 1] p_{s}$y=1 \mid x$
+\frac{(\alpha-\beta)}{1-\alpha} \phi\left(\mu_{1}\right) d x
+\end{aligned}
+\]</span></p>
+<p>If <span class="math inline">$\alpha&gt;\beta$</span>, then <span class="math inline">$\mathcal{E}_{1}&gt;\mathcal{E}_{2}$</span> and if
+<span class="math inline">$\alpha&lt;\beta$</span>, then <span class="math inline">$\mathcal{E}_{1}&lt;\mathcal{E}_{2}$</span>. Since
+<span class="math inline">\(\mathcal{E}_{1} \neq
+\mathcal{E}_{2}\)</span> for arbitrary <span class="math inline">$f$</span>, given access to <span class="math inline">$p_{s}(x, y)$</span>, and <span class="math inline">$p_{t}(x)$</span>, any method that consistently
+estimates error under covariate shift will give an incorrect estimate
+under label shift and vice-versa. The reason being that the same <span class="math inline">$p_{t}(x)$</span> and <span class="math inline">$p_{s}(x, y)$</span> can correspond to error <span class="math inline">$\mathcal{E}_{1}$</span> (under covariate shift)
+or error <span class="math inline">$\mathcal{E}_{2}$</span> (under
+label shift) either of which is not discernable absent further
+assumptions on the nature of shift.</p>
+<h1 id="c-alternate-interpretation-of-atc">C Alternate interpretation of
+ATC</h1>
+<p>Consider the following framework: Given a datum <span class="math inline">$x, y$</span>, define a binary classification
+problem of whether the model prediction <span class="math inline">\(\arg
+\max f(x)\)</span> was correct or incorrect. In particular, if the model
+prediction matches the true label, then we assign a label 1 (positive)
+and conversely, if the model prediction doesn’t match the true label
+then we assign a label 0 (negative). Our method can be interpreted as
+identifying examples for correct and incorrect prediction based on the
+value of the score function <span class="math inline">$s(f(x))$</span>, i.e., if the score <span class="math inline">$s(f(x))$</span> is greater than or equal to the
+threshold <span class="math inline">$t$</span> then our method
+predicts that the classifier correctly predicted datum <span class="math inline">$x, y$</span> and vice-versa if the score is
+less than <span class="math inline">$t$</span>. A method that can
+solve this task will perfectly estimate the target performance. However,
+such an expectation is unrealistic. Instead, ATC expects that most of
+the examples with score above threshold are correct and most of the
+examples below the threshold are incorrect. More importantly, ATC
+selects a threshold such that the number of falsely identified correct
+predictions match falsely identified incorrect predictions on source
+distribution, thereby balancing incorrect predictions. We expect useful
+estimates of accuracy with ATC if the threshold transfers to target,
+i.e. if the number of falsely identified correct predictions match
+falsely identified incorrect predictions on target. This interpretation
+relates our method to the OOD detection literature where Hendrycks &amp;
+Gimpel (2016); Hendrycks et al. (2019) highlight that classifiers tend
+to assign higher confidence to in-distribution examples and leverage
+maximum softmax confidence (or logit) to perform OOD detection.</p>
+<h2 id="d-details-on-the-toy-model">D Details on the Toy Model</h2>
+<p>Skews observed in this toy model In Fig. 4, we illustrate the toy
+model used in our empirical experiment. In the same setup, we
+empirically observe that the margin on population with less density is
+large, i.e., margin is much greater than <span class="math inline">$\gamma$</span> when the number of observed
+samples is small (in Fig. 4 (d)). Building on this observation,
+Nagarajan et al. (2020) showed in cases when margin decreases with
+number of samples, a max margin classifier trained on finite samples is
+bound to depend on the spurious features in such cases. They referred to
+this skew as geometric skew.</p>
+<p>Moreover, even when the number of samples are large so that we do not
+observe geometric skews, Nagarajan et al. (2020) showed that training
+for finite number of epochs, a linear classifier will have a non zero
+dependency on the spurious feature. They referred to this skew as
+statistical skew. Due both of these skews, we observe that a linear
+classifier obtained with training for finite steps on training data with
+finite samples, will have a non-zero dependency on the spurious feature.
+We refer interested reader to Nagarajan et al. (2020) for more details.
+Proof of Theorem 1 Recall, we consider a easy-to-learn binary
+classification problem with two features <span class="math inline">\$x=\left[x_{\mathrm{inv}}, x_{\mathrm{sp}}\right]
+\in \mathbb{R}^{2}\$</span> where <span class="math inline">$x_{\mathrm{inv}}$</span> is fully predictive
+invariant feature with a margin <span class="math inline">$\gamma&gt;0$</span> and <span class="math inline">$x_{\mathrm{sp}} \in\{-1,1\}$</span> is a spurious
+feature (i.e., a feature that is correlated but not predictive of the
+true label). Conditional on <span class="math inline">$y$</span>, the
+distribution over <span class="math inline">$x_{\text {inv }}$</span>
+is given as follows:</p>
+<p><span class="math display">\[
+x_{\mathrm{inv}} \mid y \sim\left\{\begin{array}{lr}
+U[\gamma, c] &amp; y=1 \\
+U[-c,-\gamma] &amp; y=-1
+\end{array}\right.
+\]</span></p>
+<p>where <span class="math inline">$c$</span> is a fixed constant
+greater than <span class="math inline">$\gamma$</span>. For
+simplicity, we assume that label distribution on source is uniform on
+<span class="math inline">$\{-1,1\} . x_{\text {sp }}$</span> is
+distributed such that <span class="math inline">\(P_{s}\left[x_{\text
+{sp }} \cdot(2 y-1)&gt;0\right]=p_{\text {sp }}\)</span>, where <span class="math inline">$p_{\text {sp }} \in(0.5,1.0)$</span> controls the
+degree of spurious correlation. To model distribution shift, we simulate
+target data with different degree of spurious correlation, i.e., in
+target distribution <span class="math inline">\(P_{t}\left[x_{\text {sp
+}} \cdot(2 y-1)&gt;0\right]=p_{\text {sp }}^{\prime} \in[0,1]\)</span>.
+Note that here we do not consider shifts in the label distribution but
+our result extends to arbitrary shifts in the label distribution as
+well.</p>
+<figure>
+<img alt="img-3.jpeg" src="img-3.jpeg"/>
+<figcaption aria-hidden="true">img-3.jpeg</figcaption>
+</figure>
+<p>Figure 4: Illustration of toy model. (a) Source data at <span class="math inline">$n=100$</span>. (b) Target data with <span class="math inline">$p_{s}^{\prime}=0.5$</span>. (b) Target data with
+<span class="math inline">$p_{s}^{\prime}=0.9$</span>. (c) Margin of
+<span class="math inline">$x_{\text {inv }}$</span> in the minority
+group in source data. As sample size increases the margin saturates to
+true margin <span class="math inline">$\gamma=0.1$</span>.</p>
+<p>In this setup, we examine linear sigmoid classifiers of the form
+<span class="math inline">\(f(x)=\left[\frac{1}{1+e^{w T x}}, \frac{e^{w
+T x}}{1+e^{w T x}}\right]\)</span> where <span class="math inline">\$w=\left[w_{\text {inv }}, w_{\text {sp }}\right]
+\in \mathbb{R}^{2}\$</span>. We show that given a linear classifier that
+relies on the spurious feature and achieves a non-trivial performance on
+the source (i.e., <span class="math inline">\(w_{\text {inv
+}}&gt;0\)</span> ), ATC with maximum confidence score function
+consistently estimates the accuracy on the target distribution. Define
+<span class="math inline">\$X_{M}=\left\{x \mid x_{\text {sp
+}}\right.\$</span> <span class="math inline">\(\left.(2
+y-1)&lt;0\right\}\)</span> and <span class="math inline">\$X_{C}=\left\{x \mid x_{\text {sp }} \cdot(2
+y-1$&gt;0\right\}\)</span>. Notice that in target distributions, we are
+changing the fraction of examples in <span class="math inline">$X_{M}$</span> and <span class="math inline">$X_{C}$</span> but we are not changing the
+distribution of examples within individual set. Theorem 3. Given any
+classifier <span class="math inline">$f$</span> with <span class="math inline">$w_{\text {inv }}&gt;0$</span> in the above
+setting, assume that the threshold <span class="math inline">$t$</span> is obtained with finite sample
+approximation of (1), i.e., <span class="math inline">$t$</span> is
+selected such that <span class="math inline">${ }^{2}$</span></p>
+<p><span class="math display">\[
+\sum_{i=1}^{n}\left[\mathbb{I}\left[\max _{j \in \mathcal{Y}}
+f_{j}\left(x_{i}\right)&lt;t\right]\right]=\sum_{i=1}^{n}\left[\mathbb{I}\left[\arg
+\max _{j \in \mathcal{Y}} f_{j}\left(x_{i}\right) \neq
+y_{i}\right]\right]
+\]</span></p>
+<p>where <span class="math inline">\(\left\{\left(x_{i},
+y_{i}\right)\right\}_{i=1}^{n}
+\sim\left(\mathcal{D}^{\delta}\right)^{n}\)</span> are <span class="math inline">$n$</span> samples from source distribution. Fix a
+<span class="math inline">$\delta&gt;0$</span>. Assuming <span class="math inline">\(n \geqslant 2 \log (4 / \delta) /\left(1-p_{s
+p}\right)^{2}\)</span>, then the estimate of accuracy by ATC as in (2)
+satisfies the following with probability at least <span class="math inline">$1-\delta$</span>,</p>
+<p><span class="math display">\[
+\left|\mathbb{E}_{x \sim
+\mathcal{D}^{t}}[\mathbb{I}[s(f(x))&lt;t]]-\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{t}}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}}
+f_{j}(x) \neq y\right]\right]\right| \leqslant \sqrt{\frac{\log (8 /
+\delta)}{n \cdot c_{s p}}}
+\]</span></p>
+<p>where <span class="math inline">$\mathcal{D}^{t}$</span> is any
+target distribution considered in our setting and <span class="math inline">$c_{s p}=\left(1-p_{s p}\right)$</span> if <span class="math inline">$w_{s p}&gt;0$</span> and <span class="math inline">$c_{s p}=p_{s p}$</span> otherwise.</p>
+<p>[^0] [^0]: <span class="math inline">${ }^{2}$</span> Note that
+this is possible because a linear classifier with sigmoid activation
+assigns a unique score to each point in source distribution.</p>
+<p>Proof. First we consider the case of <span class="math inline">$w_{\text {sp }}&gt;0$</span>. The proof follows
+in two simple steps. First we notice that the classifier will make an
+error only on some points in <span class="math inline">$X_{M}$</span>
+and the threshold <span class="math inline">$t$</span> will be
+selected such that the fraction of points in <span class="math inline">$X_{M}$</span> with maximum confidence less than
+the threshold <span class="math inline">$t$</span> will match the
+error of the classifier on <span class="math inline">$X_{M}$</span>.
+Classifier with <span class="math inline">\(w_{\text {sp
+}}&gt;0\)</span> and <span class="math inline">\(w_{\text {inv
+}}&gt;0\)</span> will classify all the points in <span class="math inline">$X_{C}$</span> correctly. Second, since the
+distribution of points is not changing within <span class="math inline">$X_{M}$</span> and <span class="math inline">$X_{C}$</span>, the same threshold continues to
+work for arbitrary shift in the fraction of examples in <span class="math inline">$X_{M}$</span>, i.e., <span class="math inline">$p_{\text {sp }}^{\prime}$</span>.</p>
+<p>Note that when <span class="math inline">\(w_{\text {sp
+}}&gt;0\)</span>, the classifier makes no error on points in <span class="math inline">$X_{C}$</span> and makes an error on a subset
+<span class="math inline">\(X_{\text {err }}=\left\{x \mid x_{\text {sp
+}} \cdot(2 y-1)&lt;0 \&amp;\left(w_{\text {inv }} x_{\text {inv
+}}+w_{\text {sp }} x_{\text {sp }}\right) \cdot(2 y-1) \leqslant
+0\right\}\)</span> of <span class="math inline">$X_{M}$</span>, i.e.,
+<span class="math inline">$X_{\text {err }} \subseteq X_{M}$</span>.
+Consider <span class="math inline">\(X_{\text {thres }}=\left\{x \mid
+\arg \max _{y \in \mathcal{Y}} f_{y}(x) \leqslant t\right\}\)</span> as
+the set of points that obtain a score less than or equal to <span class="math inline">$t$</span>. Now we will show that ATC chooses a
+threshold <span class="math inline">$t$</span> such that all points in
+<span class="math inline">$X_{C}$</span> gets a score above <span class="math inline">$t$</span>, i.e., <span class="math inline">$X_{\text {thres }} \subseteq X_{M}$</span>. First
+note that the score of points close to the true separator in <span class="math inline">$X_{C}$</span>, i.e., at <span class="math inline">$x_{1}=(\gamma, 1)$</span> and <span class="math inline">$x_{2}=(-\gamma,-1)$</span> match. In other words,
+score at <span class="math inline">$x_{1}$</span> matches with the
+score of <span class="math inline">$x_{2}$</span> by symmetricity,
+i.e.,</p>
+<p><span class="math display">\[
+\underset{y \in \mathcal{Y}}{\arg \max }
+f_{y}\left(x_{1}\right)=\underset{y \in \mathcal{Y}}{\arg \max }
+f_{y}\left(x_{2}\right)=\frac{e^{w_{\text {inv }} \gamma+w_{\text {sp
+}}}}{\left(1+e^{w_{\text {inv }} \gamma+w_{\text {sp }}}\right)}
+\]</span></p>
+<p>Hence, if <span class="math inline">\(t \geqslant \arg \max _{y \in
+\mathcal{Y}} f_{y}\left(x_{1}\right)\)</span> then we will have <span class="math inline">\(\left|X_{\text {err }}\right|&lt;\left|X_{\text
+{thres }}\right|\)</span> which is contradiction violating definition of
+<span class="math inline">$t$</span> as in (12). Thus <span class="math inline">$X_{\text {thres }} \subseteq X_{M}$</span>.</p>
+<p>Now we will relate LHS and RHS of (12) with their expectations using
+Hoeffdings and DKW inequality to conclude (13). Using Hoeffdings’ bound,
+we have with probability at least <span class="math inline">\(1-\delta /
+4\)</span></p>
+<p><span class="math display">\[
+\left|\sum_{i \in X_{M}} \frac{\left[\mathbb{I}\left[\arg \max _{j \in
+\mathcal{Y}} f_{j}\left(x_{i}\right) \neq
+y_{i}\right]\right]}{\left|X_{M}\right|}-\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{\mathrm{T}}}\left[\mathbb{I}\left[\arg \max _{j \in
+\mathcal{Y}} f_{j}(x) \neq y\right]\right]\right| \leqslant
+\sqrt{\frac{\log (8 / \delta)}{2\left|X_{M}\right|}}
+\]</span></p>
+<p>With DKW inequality, we have with probability at least <span class="math inline">$1-\delta / 4$</span></p>
+<p><span class="math display">\[
+\left|\sum_{i \in X_{M}} \frac{\left[\mathbb{I}\left[\max _{j \in
+\mathcal{Y}}
+f_{j}\left(x_{i}\right)&lt;t^{\prime}\right]\right]}{\left|X_{M}\right|}-\mathbb{E}_{(x,
+y) \sim \mathcal{D}^{\mathrm{T}}}\left[\mathbb{I}\left[\max _{j \in
+\mathcal{Y}} f_{j}(x)&lt;t^{\prime}\right]\right]\right| \leqslant
+\sqrt{\frac{\log (8 / \delta)}{2\left|X_{M}\right|}}
+\]</span></p>
+<p>for all <span class="math inline">$t^{\prime}&gt;0$</span>.
+Combining (15) and (16) at <span class="math inline">$t^{\prime}=t$</span> with definition (12), we
+have with probability at least <span class="math inline">\(1-\delta /
+2\)</span></p>
+<p><span class="math display">\[
+\left|\mathbb{E}_{x \sim
+\mathcal{D}^{\mathrm{T}}}[I(s(f(x))&lt;t]]-\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{\mathrm{T}}}\left[\mathbb{I}\left[\arg \max _{j \in
+\mathcal{Y}} f_{j}(x) \neq y\right]\right]\right| \leqslant
+\sqrt{\frac{\log (8 / \delta)}{2\left|X_{M}\right|}}
+\]</span></p>
+<p>Now for the case of <span class="math inline">\(w_{\text {sp
+}}&lt;0\)</span>, we can use the same arguments on <span class="math inline">$X_{C}$</span>. That is, since now all the error
+will be on points in <span class="math inline">$X_{C}$</span> and
+classifier will make no error <span class="math inline">$X_{M}$</span>, we can show that threshold <span class="math inline">$t$</span> will be selected such that the fraction
+of points in <span class="math inline">$X_{C}$</span> with maximum
+confidence less than the threshold <span class="math inline">$t$</span> will match the error of the classifier
+on <span class="math inline">$X_{C}$</span>. Again, since the
+distribution of points is not changing within <span class="math inline">$X_{M}$</span> and <span class="math inline">$X_{C}$</span>, the same threshold continues to
+work for arbitrary shift in the fraction of examples in <span class="math inline">$X_{M}$</span>, i.e., <span class="math inline">$p_{\text {sp }}^{\prime}$</span>. Thus with
+similar arguments, we have</p>
+<p><span class="math display">\[
+\left|\mathbb{E}_{x \sim
+\mathcal{D}^{\mathrm{T}}}[I(s(f(x))&lt;t]]-\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{\mathrm{T}}}\left[I\left[\arg \max _{j \in \mathcal{Y}}
+f_{j}(x) \neq y\right]\right]\right| \leqslant \sqrt{\frac{\log (8 /
+\delta)}{2\left|X_{C}\right|}}
+\]</span></p>
+<p>Using Hoeffdings’ bound, with probability at least <span class="math inline">$1-\delta / 2$</span>, we have</p>
+<p><span class="math display">\[
+\left|X_{M}-n \cdot\left(1-p_{\text {sp }}\right)\right| \leqslant
+\sqrt{\frac{n \cdot \log (4 / \delta)}{2}}
+\]</span></p>
+<p>With probability at least <span class="math inline">\(1-\delta /
+2\)</span>, we have</p>
+<p><span class="math display">\[
+\left|X_{C}-n \cdot p_{\text {sp }}\right| \leqslant \sqrt{\frac{n \cdot
+\log (4 / \delta)}{2}}
+\]</span></p>
+<p>Combining (19) and (17), we get the desired result for <span class="math inline">$w_{\text {sp }}&gt;0$</span>. For <span class="math inline">$w_{\text {sp }}&lt;0$</span>, we combine (20) and
+(18) to get the desired result.</p>
+<figure>
+<img alt="img-4.jpeg" src="img-4.jpeg"/>
+<figcaption aria-hidden="true">img-4.jpeg</figcaption>
+</figure>
+<p>Figure 5: Failure of ATC in our toy model. Shifting the support of
+target class conditional <span class="math inline">\(p_{t}\left(x_{\text
+{inv }} \mid y\right)\)</span> may introduce a bias in ATC estimates,
+e.g., shrinking the support to <span class="math inline">$c_{1}(&lt;c)$</span> (while maintaining uniform
+distribution) in the target leads to overestimation bias.</p>
+<p>Issues with IM in toy setting As described in App. E, we observe that
+IM is sensitive to binning strategy. In the main paper, we include IM
+result with uniform mass binning with 100 bins. Empirically, we observe
+that we recover the true performance with IM if we use equal width
+binning with number of bins greater than 5 .</p>
+<p>Biased estimation with ATC in our toy model We assumed that both in
+source and target <span class="math inline">\$x_{\text {inv }} \mid
+y=1\$</span> is uniform between <span class="math inline">\([\gamma,
+c]\)</span> and <span class="math inline">$x \mid y=-1$</span> is
+uniform between <span class="math inline">$[-c,-\gamma]$</span>.
+Shifting the support of target class conditional <span class="math inline">$p_{t}\left(x_{\text {inv }} \mid y\right)$</span>
+may introduce a bias in ATC estimates, e.g., shrinking the support to
+<span class="math inline">$c_{1}(&lt;c)$</span> (while maintaining
+uniform distribution) in the target will lead to an over-estimation of
+the target performance with ATC. We show this failure in Fig. 5. The
+reason being that with the same threshold that we see more examples
+falsely identified as correct as compared to examples falsely identified
+as incorrect.</p>
+<h1 id="d.-1-a-more-general-result">D. 1 A More General Result</h1>
+<p>Recall, for a given threshold <span class="math inline">$t$</span>,
+we categorize an example <span class="math inline">$x, y$</span> as
+a falsely identified correct prediction (ficp) if the predicted label
+<span class="math inline">$\widehat{y}=\arg \max f(x)$</span> is not
+the same as <span class="math inline">$y$</span> but the predicted
+score <span class="math inline">$f_{\widehat{y}}(x)$</span> is greater
+than <span class="math inline">$t$</span>. Similarly, an example is
+falsely identified incorrect prediction (fiip) if the predicted label
+<span class="math inline">$\widehat{y}$</span> is the same as <span class="math inline">$y$</span> but the predicted score <span class="math inline">$f_{\widehat{y}}(x)$</span> is less than <span class="math inline">$t$</span>.</p>
+<p>In general, we believe that our method will obtain consistent
+estimates in scenarios where the relative distribution of covariates
+doesn’t change among examples that are falsely identified as incorrect
+and examples that are falsely identified as correct. In other words, ATC
+is expected to work if the distribution shift is such that falsely
+identified incorrect predictions match falsely identified correct
+prediction.</p>
+<h2 id="d.-2-atc-produces-consistent-estimate-on-source-distribution">D.
+2 ATC PRODUCES CONSISTENT ESTIMATE ON SOURCE DISTRIBUTION</h2>
+<p>Proposition 2. Given labeled validation data <span class="math inline">\(\left\{\left(x_{i},
+y_{i}\right)\right\}_{i=1}^{n}\)</span> from a distribution <span class="math inline">$\mathcal{D}^{S}$</span> and a model <span class="math inline">$f$</span>, choose a threshold <span class="math inline">$t$</span> as in (1). Then for <span class="math inline">$\delta&gt;0$</span>, with probability at least
+<span class="math inline">$1-\delta$</span>, we have</p>
+<p><span class="math display">\[
+\mathbb{E}_{(x, y) \sim \mathcal{D}}\left[\mathbb{I}\left[\max _{j \in
+\mathcal{Y}} f_{j}(x)&lt;t\right]-\mathbb{I}\left[\arg \max _{j \in
+\mathcal{Y}} f_{j}(x) \neq y\right]\right] \leqslant 2 \sqrt{\frac{\log
+(4 / \delta)}{2 n}}
+\]</span></p>
+<p>Proof. The proof uses (i) Hoeffdings’ inequality to relate the
+accuracy with expected accuracy; and (ii) DKW inequality to show the
+concentration of the estimated accuracy with our proposed method.
+Finally, we combine (i) and (ii) using the fact that at selected
+threshold <span class="math inline">$t$</span> the number of false
+positives is equal to the number of false negatives. Using Hoeffdings’
+bound, we have with probability at least <span class="math inline">$1-\delta / 2$</span></p>
+<p><span class="math display">\[
+\left|\sum_{i=1}^{n}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}}
+f_{j}\left(x_{i}\right) \neq y_{i}\right]\right]-\mathbb{E}_{(x, y) \sim
+\mathcal{D}}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}}
+f_{j}(x) \neq y\right]\right]\right| \leqslant \sqrt{\frac{\log (4 /
+\delta)}{2 n}}
+\]</span></p>
+<p>With DKW inequality, we have with probability at least <span class="math inline">$1-\delta / 2$</span></p>
+<p><span class="math display">\[
+\left|\sum_{i=1}^{n}\left[\mathbb{I}\left[\max _{j \in \mathcal{Y}}
+f_{j}\left(x_{i}\right)&lt;t^{\prime}\right]\right]-\mathbb{E}_{(x, y)
+\sim \mathcal{D}}\left[\mathbb{I}\left[\max _{j \in \mathcal{Y}}
+f_{j}(x)&lt;t^{\prime}\right]\right]\right| \leqslant \sqrt{\frac{\log
+(4 / \delta)}{2 n}}
+\]</span></p>
+<p>for all <span class="math inline">$t^{\prime}&gt;0$</span>. Finally
+by definition, we have</p>
+<p><span class="math display">\[
+\sum_{i=1}^{n}\left[\mathbb{I}\left[\max _{j \in \mathcal{Y}}
+f_{j}\left(x_{i}\right)&lt;t^{\prime}\right]\right]=\sum_{i=1}^{n}\left[\mathbb{I}\left[\underset{j
+\in \mathcal{Y}}{\arg \max } f_{j}\left(x_{i}\right) \neq
+y_{i}\right]\right]
+\]</span></p>
+<p>Combining (22), (23) at <span class="math inline">$t^{\prime}=t$</span>, and (24), we have the
+desired result.</p>
+<h1 id="e-basline-methods">E BASLINE METHODS</h1>
+<p>Importance-re-weighting (IM) If we can estimate the importance-ratios
+<span class="math inline">$\frac{p_{1}(x)}{p_{s}(x)}$</span> with just
+the unlabeled data from the target and validation labeled data from
+source, then we can estimate the accuracy as on target as follows:</p>
+<p><span class="math display">\[
+\mathcal{E}_{\mathcal{D}^{t}}(f)=\mathbb{E}_{(x, y) \sim
+\mathcal{D}^{t}}\left[\frac{p_{t}(x)}{p_{s}(x)} \mathbb{I}[f(x) \neq
+y]\right]
+\]</span></p>
+<p>As previously discussed, this is particularly useful in the setting
+of covariate shift (within support) where importance ratios estimation
+has been explored in the literature in the past. Mandolin (Chen et al.,
+2021b) extends this approach. They estimate importance-weights with use
+of extra supervision about the axis along which the distribution is
+shifting. In our work, we experiment with uniform mass binning and equal
+width binning with the number of bins in <span class="math inline">$[5,10,50]$</span>. Overall, we observed that
+equal width binning works the best with 10 bins. Hence throughout this
+paper we perform equal width binning with 10 bins to include results
+with IM. Average Confidence (AC) If we expect the classifier to be
+argmax calibrated on the target then average confidence is equal to
+accuracy of the classifier. Formally, by definition of argmax
+calibration of <span class="math inline">$f$</span> on any
+distribution <span class="math inline">$\mathcal{D}$</span>, we
+have</p>
+<p><span class="math display">\[
+\mathcal{E}_{\mathcal{D}}(f)=\mathbb{E}_{(x, y) \sim
+\mathcal{D}}\left[\mathbb{I}\left[y \notin \underset{j \in
+\mathcal{Y}}{\arg \max } f_{j}(x)\right]\right]=\mathbb{E}_{(x, y) \sim
+\mathcal{D}}\left[\max _{j \in \mathcal{Y}} f_{j}(x)\right]
+\]</span></p>
+<p>Difference Of Confidence We estimate the error on target by
+subtracting difference of confidences on source and target (as a
+distributional distance (Guillory et al., 2021)) from expected error on
+source distribution, i.e, <span class="math inline">\(\mathrm{DOC}_{\mathcal{D}^{t}}=\mathbb{E}_{x \sim
+\mathcal{D}^{t}}\left[\mathbb{I}\left[\arg \max _{j \in \mathcal{Y}}
+f_{j}(x) \neq y\right]\right]+\mathbb{E}_{x \sim
+\mathcal{D}^{t}}\left[\max _{j \in \mathcal{Y}}
+f_{j}(x)\right]-\)</span> <span class="math inline">\(\mathbb{E}_{x \sim
+\mathcal{D}^{t}}\left[\max _{j \in \mathcal{Y}}
+f_{j}(x)\right]\)</span>. This is referred to as DOC-Feat in (Guillory
+et al., 2021). Generalized Disagreement Equality (GDE) Jiang et
+al. (2021) proposed average disagreement of two models (trained on the
+same training set but with different initialization and/or different
+data ordering) as a approximate measure of accuracy on the underlying
+data, i.e.,</p>
+<p><span class="math display">\[
+\mathcal{E}_{\mathcal{D}}(f)=\mathbb{E}_{(x, y) \sim
+\mathcal{D}}\left[\mathbb{I}\left[f(x) \neq f^{\prime}(x)\right]\right]
+\]</span></p>
+<p>They show that marginal calibration of the model is sufficient to
+have expected test error equal to the expected of average disagreement
+of two models where the latter expectation is also taken over the models
+used to calculate disagreement.</p>
+<h2 id="f-details-on-the-dataset-setup">F DETAILS ON THE DATASET
+SETUP</h2>
+<p>In our empirical evaluation, we consider both natural and synthetic
+distribution shifts. We consider shifts on ImageNet (Russakovsky et al.,
+2015), CIFAR Krizhevsky &amp; Hinton (2009), FMoWWilDS (Christie et al.,
+2018), RxRx1-WilDS (Taylor et al., 2019), Amazon-WilDS (Ni et al.,
+2019), CivilComments-WilDS (Borkan et al., 2019), and MNIST LeCun et
+al. (1998) datasets.</p>
+<table>
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Train (Source)</th>
+<th style="text-align: center;">Valid (Source)</th>
+<th style="text-align: center;">Evaluation (Target)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">MNIST (train)</td>
+<td style="text-align: center;">MNIST (valid)</td>
+<td style="text-align: center;">USPS, SVHN and Q-MNIST</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR10 (train)</td>
+<td style="text-align: center;">CIFAR10 (valid)</td>
+<td style="text-align: center;">CIFAR10v2, 95 CIFAR10-C datasets (Fog
+and Motion blur, etc. )</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR100 (train)</td>
+<td style="text-align: center;">CIFAR100 (valid)</td>
+<td style="text-align: center;">95 CIFAR100-C datasets (Fog and Motion
+blur, etc. )</td>
+</tr>
+<tr>
+<td style="text-align: center;">FMoW (2002-12) (train)</td>
+<td style="text-align: center;">FMoW (2002-12) (valid)</td>
+<td style="text-align: center;">FMoW <span class="math inline">$\{2013-15,2016-17\} \times$</span></td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(All, Africa, Americas, Oceania, Asia,
+and Europe) <span class="math inline">$\}$</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">RxRx1 (train)</td>
+<td style="text-align: center;">RxRx1(id-val)</td>
+<td style="text-align: center;">RxRx1 (id-test, OOD-val, OOD-test)</td>
+</tr>
+<tr>
+<td style="text-align: center;">Amazon (train)</td>
+<td style="text-align: center;">Amazon (id-val)</td>
+<td style="text-align: center;">Amazon (OOD-val, OOD-test)</td>
+</tr>
+<tr>
+<td style="text-align: center;">CivilComments (train)</td>
+<td style="text-align: center;">CivilComments (id-val)</td>
+<td style="text-align: center;">CivilComments (8 demographic identities
+male, female, LGBTQ, Christian, Muslim, other religions, Black, and
+White)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet (train)</td>
+<td style="text-align: center;">ImageNet (valid)</td>
+<td style="text-align: center;">3 ImageNetv2 datasets, ImageNet-Sketch,
+95 ImageNet-C datasets</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet-200 (train)</td>
+<td style="text-align: center;">ImageNet-200 (valid)</td>
+<td style="text-align: center;">3 ImageNet-200v2 datasets, ImageNet-R,
+ImageNet200-Sketch, 95 ImageNet200-C datasets</td>
+</tr>
+<tr>
+<td style="text-align: center;">BREEDS (train)</td>
+<td style="text-align: center;">BREEDS (valid)</td>
+<td style="text-align: center;">Same subpopulations as train but unseen
+images from natural and synthetic shifts in ImageNet, Novel
+subpopulations on natural and synthetic shifts</td>
+</tr>
+</tbody>
+</table>
+<p>Table 2: Details of the test datasets considered in our
+evaluation.</p>
+<p>ImageNet setup. First, we consider synthetic shifts induced to
+simulate 19 different visual corruptions (e.g., shot noise, motion blur,
+pixelation etc.) each with 5 different intensities giving us a total of
+95 datasets under ImageNet-C (Hendrycks &amp; Dietterich, 2019). Next,
+we consider natural distribution shifts due to differences in the data
+collection process. In particular, we consider 3 ImageNetv2 (Recht et
+al., 2019) datasets each using a different strategy to collect test
+sets. We also evaluate performance on images with artistic renditions of
+object classes, i.e., ImageNet-R (Hendrycks et al., 2021) and
+ImageNet-Sketch (Wang et al., 2019) with hand drawn sketch images. Note
+that renditions dataset only contains 200 classes from ImageNet. Hence,
+in the main paper we include results on ImageNet restricted to these 200
+classes, which we call as ImageNet-200, and relegate results on ImageNet
+with 1 k classes to appendix. We also consider BREEDS benchmark
+(Santurkar et al., 2020) in our evaluation to assess robustness to
+subpopulation shifts, in particular, to understand how accuracy
+estimation methods behave when novel subpopulations not observed during
+training are introduced. BREEDS leverages class hierarchy in ImageNet to
+repurpose original classes to be the subpopulations and defines a
+classification task on superclasses. Subpopulation shift is induced by
+directly making the subpopulations present in the training and test
+distributions disjoint. Overall, BREEDS benchmark contains 4 datasets
+Entity-13, Entity-30, Living-17, Non-Living-26, each focusing on
+different subtrees in the hierarchy. To generate BREEDS dataset on top
+of ImageNet, we use the open source library: https:
+//github.com/MadryLab/BREEDS-Benchmarks. We focus on natural and
+synthetic shifts as in ImageNet on same and different subpopulations in
+BREEDs. Thus for both the subpopulation (same or novel), we obtain a
+total of 99 target datasets.</p>
+<p>CIFAR setup. Similar to the ImageNet setup, we consider (i) synthetic
+shifts (CIFAR-10-C) due to common corruptions; and (ii) natural
+distribution shift (i.e., CIFARv2 (Recht et al., 2018; Torralba et al.,
+2008)) due to differences in data collection strategy on on CIFAR-10
+(Krizhevsky &amp; Hinton, 2009). On CIFAR-100, we just have synthetic
+shifts due to common corruptions.</p>
+<p>FMoW-WILDS setup. In order to consider distribution shifts faced in
+the wild, we consider FMoWwILDS (Koh et al., 2021; Christie et al.,
+2018) from WILDS benchmark, which contains satellite images taken in
+different geographical regions and at different times. We obtain 12
+different OOD target sets by considering images between years 2013-2016
+and 2016-2018 and by considering five geographical regions as
+subpopulations (Africa, Americas, Oceania, Asia, and Europe) separately
+and together. <span class="math inline">$R x R x 1$</span>-WILDS
+setup. Similar to FMoW, we consider RxRx1-WILDS (Taylor et al., 2019)
+from WILDS benchmark, which contains image of cells obtained by
+fluorescent microscopy and the task</p>
+<p>is to genetic treatments the cells received. We obtain 3 target
+datasets with shift induced by batch effects which make it difficult to
+draw conclusions from data across experimental batches. Amazon-WilDS
+setup. For natural language task, we consider Amazon-WilDS (Ni et al.,
+2019) dataset from WILDS benchmark, which contains review text and the
+task is get a corresponding star rating from 1 to 5 . We obtain 2 target
+datasets by considered shifts induced due to different set of reviewers
+than the training set.</p>
+<p>CivilComments-WilDS setup. We also consider CivilComments-WilDS
+(Borkan et al., 2019) from WILDS benchmark, which contains text comments
+and the task is to classify them for toxicity. We obtain 18 target
+datasets depending on whether a comment mentions each of the 8
+demographic identities male, female, LGBTQ, Christian, Muslim, other
+religions, Black, and White.</p>
+<p>MNIST setup. For completeness, we also consider distribution shifts
+on MNIST (LeCun et al., 1998) digit classification as in the prior work
+(Deng &amp; Zheng, 2021). We use three real shifted datasets, i.e., USPS
+(Hull, 1994), SVHN (Netzer et al., 2011) and QMNIST (Yadav &amp; Bottou,
+2019).</p>
+<h1 id="g-details-on-the-experimental-setup">G Details on the
+Experimental Setup</h1>
+<p>All experiments were run on NVIDIA Tesla V100 GPUs. We used PyTorch
+(Paszke et al., 2019) for experiments.</p>
+<p>Deep nets We consider a 4-layered MLP. The PyTorch code for 4-layer
+MLP is as follows:</p>
+<pre><code>nn.Sequential(nn.Flatten(),
+    nn.Linear$input_dim, 5000, bias=True$,
+    nn.ReLU(),
+    nn.Linear$5000, 5000, bias=True$,
+    nn.ReLU(),
+    nn.Linear$5000, 50, bias=True$,
+    nn.ReLU(),
+    nn.Linear$50, num_label, bias=True$
+    )</code></pre>
+<p>We mainly experiment convolutional nets. In particular, we use
+ResNet18 (He et al., 2016), ResNet50, and DenseNet121 (Huang et al.,
+2017) architectures with their default implementation in PyTorch.
+Whenever we initial our models with pre-trained models, we again use
+default models in PyTorch.</p>
+<p>Hyperparameters and Training details As mentioned in the main text we
+do not alter the standard training procedures and hyperparameters for
+each task. We present results at final model, however, we observed that
+the same results extend to an early stopped model as well. For
+completeness, we include these details below:</p>
+<p>CIFAR10 and CIFAR100 We train DenseNet121 and ResNet18 architectures
+from scratch. We use SGD training with momentum of 0.9 for 300 epochs.
+We start with learning rate 0.1 and decay it by multiplying it with 0.1
+every 100 epochs. We use a weight decay of <span class="math inline">$5^{-} 4$</span>. We use batch size of 200 . For
+CIFAR10, we also experiment with the same models pre-trained on
+ImageNet.</p>
+<p>ImageNet For training, we use Adam with a batch size of 64 and
+learning rate 0.0001 . Due to huge size of ImageNet, we could only train
+two models needed for GDE for 10 epochs. Hence, for relatively small
+scale experiments, we also perform experiments on ImageNet subset with
+200 classes, which we call as ImageNet-200 with the same training
+procedure. These 200 classes are the same classes as in ImageNet-R
+dataset. This not only allows us to train ImageNet for 50 epochs but
+also allows us to use ImageNet-R in our testbed. On the both the
+datasets, we observe a similar superioriy with ATC. Note that all the
+models trained here were initialized with a pre-trained ImageNet model
+with the last layer replaced with random weights.</p>
+<p>FMoW-wilDS For all experiments, we follow Koh et al. (2021) and use
+two architectures DenseNet121 and ResNet50, both pre-trained on
+ImageNet. We use the Adam optimizer (Kingma &amp; Ba, 2014) with an
+initial learning rate of <span class="math inline">$10^{-4}$</span>
+that decays by 0.96 per epoch, and train for 50 epochs and with a batch
+size of 64 .</p>
+<p><span class="math inline">$R x R x l$</span>-WILDS For all
+experiments, we follow Koh et al. (2021) and use two architectures
+DenseNet121 and ResNet50, both pre-trained on ImageNet. We use Adam
+optimizer with a learning rate of <span class="math inline">\(1
+e-4\)</span> and L2-regularization strength of <span class="math inline">$1 e-5$</span> with a batch size of 75 for 90
+epochs. We linearly increase the learning rate for 10 epochs, then
+decreasing it following a cosine learning rate schedule. Finally, we
+pick the model that obtains highest in-distribution validation accuracy.
+Amazon-WILDS For all experiments, we follow Koh et al. (2021) and
+finetuned DistilBERT-base-uncased models (Sanh et al., 2019), using the
+implementation from Wolf et al. (2020), and with the following
+hyperparameter settings: batch size 8 ; learning rate <span class="math inline">$1 e-5$</span> with the AdamW optimizer
+(Loshchilov &amp; Hutter, 2017); L2-regularization strength 0.01; 3
+epochs with early stopping; and a maximum number of tokens of 512 .
+CivilComments-WILDS For all experiments, we follow Koh et al. (2021) and
+fine-tuned DistilBERT-base-uncased models (Sanh et al., 2019), using the
+implementation from Wolf et al. (2020) and with the following
+hyperparameter settings: batch size 16 ; learning rate <span class="math inline">$1 e-5$</span> with the AdamW optimizer
+(Loshchilov &amp; Hutter, 2017) for 5 epochs; L2-regularization strength
+0.01 ; and a maximum number of tokens of 300 . Living17 and Nonliving26
+from BREEDS For training, we use SGD with a batch size of 128 , weight
+decay of <span class="math inline">$10^{-4}$</span>, and learning rate
+0.1 . Models were trained until convergence. Models were trained for a
+total of 450 epochs, with 10 -fold learning rate drops every 150 epochs.
+Note that since we want to evaluate models for novel subpopulations no
+pre-training was used. We train two architectures DenseNet121 and
+ResNet50. Entity13 and Entity30 from BREEDS For training, we use SGD
+with a batch size of 128 , weight decay of <span class="math inline">$10^{-4}$</span>, and learning rate 0.1 . Models
+were trained until convergence. Models were trained for a total of 300
+epochs, with 10 -fold learning rate drops every 100 epochs. Note that
+since we want to evaluate models for novel subpopulations no
+pre-training was used. We train two architectures DenseNet121 and
+ResNet50. MNIST For MNIST, we train a MLP described above with SGD with
+momentum 0.9 and learning rate 0.01 for 50 epochs. We use weight decay
+of <span class="math inline">$10^{-5}$</span> and batch size as 200.
+We have a single number for CivilComments because it is a binary
+classification task. For multiclass problems, ATC-NE and ATC-MC can lead
+to different ordering of examples when ranked with the corresponding
+scoring function. Temperature scaling on top can further alter the
+ordering of examples. The changed ordering of examples yields different
+thresholds and different accuracy estimates. However for binary
+classification, the two scoring functions are the same as entropy
+(i.e. <span class="math inline">$p \log (p)+(1-p) \log (p))$</span>
+has a one-to-one mapping to the max conf for <span class="math inline">$p \in[0,1]$</span>. Moreover, temperature scaling
+also doesn’t change the order of points for binary classification
+problems. Hence for the binary classification problems, both the scoring
+functions with and without temperature scaling yield the same estimates.
+We have made this clear in the updated draft. Implementation for
+Temperature Scaling We use temperature scaling implementation from
+https://github.com/kundajelab/abstention. We use validation set (the
+same we use to obtain ATC threshold or DOC source error estimate) to
+tune a single temperature parameter.</p>
+<h1 id="g.-1-details-on-fig.-1-right-setup">G. 1 DETAILS ON FIG. 1
+(RIGHT) SETUP</h1>
+<p>For vision datasets, we train a DenseNet model with the exception of
+FCN model for MNIST dataset. For language datasets, we fine-tune a
+DistilBERT-base-uncased model. For each of these models, we use the
+exact same setup as described Sec. G. Importantly, to obtain errors on
+the same scale, we rescale all the errors by subtracting the error of
+Average Confidence method for each model. Results are reported as mean
+of the re-scaled errors over 4 seeds.</p>
+<h1 id="h-supplementary-results">H Supplementary Results</h1>
+<h2 id="h.-1-cifar-pretraining-ablation">H. 1 CIFAR PRETRAINING
+ABLATION</h2>
+<figure>
+<img alt="img-5.jpeg" src="img-5.jpeg"/>
+<figcaption aria-hidden="true">img-5.jpeg</figcaption>
+</figure>
+<p>Figure 6: Results with a pretrained DenseNet121 model on CIFAR10. We
+observe similar behaviour as that with a model trained from scratch.</p>
+<h2 id="h.-2-breeds-results-with-regression-model">H. 2 BREEDS RESULTS
+WITH REGRESSION MODEL</h2>
+<figure>
+<img alt="img-6.jpeg" src="img-6.jpeg"/>
+<figcaption aria-hidden="true">img-6.jpeg</figcaption>
+</figure>
+<p>Figure 7: Scatter plots for DOC with linear fit. Results parallel to
+Fig. 3(Middle) on other BREEDS dataset.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Dataset</th>
+<th style="text-align: center;">DOC (w/o fit)</th>
+<th style="text-align: center;">DOC (w fit)</th>
+<th style="text-align: center;">ATC-MC (Ours) (w/o fit)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">LIVING-17</td>
+<td style="text-align: center;">24.32</td>
+<td style="text-align: center;">13.65</td>
+<td style="text-align: center;"><span class="math inline">\(\mathbf{1 0
+. 0 7}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">NONLIVING-26</td>
+<td style="text-align: center;">29.91</td>
+<td style="text-align: center;"><span class="math inline">\(\mathbf{1 8
+. 1 3}\)</span></td>
+<td style="text-align: center;">19.37</td>
+</tr>
+<tr>
+<td style="text-align: left;">ENTITY-13</td>
+<td style="text-align: center;">22.18</td>
+<td style="text-align: center;">8.63</td>
+<td style="text-align: center;">8.01</td>
+</tr>
+<tr>
+<td style="text-align: left;">ENTITY-30</td>
+<td style="text-align: center;">24.71</td>
+<td style="text-align: center;">12.28</td>
+<td style="text-align: center;"><span class="math inline">\(\mathbf{1 0
+. 2 1}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Table 5: Mean Absolute estimation Error (MAE) results for BREEDs
+datasets with novel populations in our setup. After fitting a robust
+linear model for DOC on same subpopulation, we show predicted accuracy
+on different subpopulations with fine-tuned DOC (i.e., DOC (w/ fit)) and
+compare with ATC without any regression model, i.e., ATC (w/o fit).
+While observe substantial improvements in MAE from DOC (w/o fit) to DOC
+(w/ fit), ATC (w/o fit) continues to outperform even DOC (w/ fit).</p>
+<figure>
+<img alt="img-7.jpeg" src="img-7.jpeg"/>
+<figcaption aria-hidden="true">img-7.jpeg</figcaption>
+</figure>
+<p>Figure 8: Scatter plot of predicted accuracy versus (true) OOD
+accuracy. For vision datasets except MNIST we use a DenseNet121 model.
+For MNIST, we use a FCN. For language datasets, we use
+DistillBert-base-uncased. Results reported by aggregating accuracy
+numbers over 4 different seeds.</p>
+<figure>
+<img alt="img-8.jpeg" src="img-8.jpeg"/>
+<figcaption aria-hidden="true">img-8.jpeg</figcaption>
+</figure>
+<p>Figure 9: Scatter plot of predicted accuracy versus (true) OOD
+accuracy for vision datasets except MNIST with a ResNet50 model. Results
+reported by aggregating MAE numbers over 4 different seeds.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Dataset</th>
+<th style="text-align: center;">Shift</th>
+<th style="text-align: center;">IM</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">AC</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">DOC</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">GDE</th>
+<th style="text-align: center;">ATC-MC (Ours)</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">ATC-NE (Ours)</th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR10</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">6.60</td>
+<td style="text-align: center;">5.74</td>
+<td style="text-align: center;">9.88</td>
+<td style="text-align: center;">6.89</td>
+<td style="text-align: center;">7.25</td>
+<td style="text-align: center;">6.07</td>
+<td style="text-align: center;">4.77</td>
+<td style="text-align: center;">3.21</td>
+<td style="text-align: center;">3.02</td>
+<td style="text-align: center;">2.99</td>
+<td style="text-align: center;">2.85</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.35)</td>
+<td style="text-align: center;">(0.30)</td>
+<td style="text-align: center;">(0.16)</td>
+<td style="text-align: center;">(0.13)</td>
+<td style="text-align: center;">(0.15)</td>
+<td style="text-align: center;">(0.16)</td>
+<td style="text-align: center;">(0.13)</td>
+<td style="text-align: center;">(0.49)</td>
+<td style="text-align: center;">(0.40)</td>
+<td style="text-align: center;">(0.37)</td>
+<td style="text-align: center;">(0.29)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">12.33</td>
+<td style="text-align: center;">10.20</td>
+<td style="text-align: center;">16.50</td>
+<td style="text-align: center;">11.91</td>
+<td style="text-align: center;">13.87</td>
+<td style="text-align: center;">11.08</td>
+<td style="text-align: center;">6.55</td>
+<td style="text-align: center;">4.65</td>
+<td style="text-align: center;">4.25</td>
+<td style="text-align: center;">4.21</td>
+<td style="text-align: center;">3.87</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.51)</td>
+<td style="text-align: center;">(0.48)</td>
+<td style="text-align: center;">(0.26)</td>
+<td style="text-align: center;">(0.17)</td>
+<td style="text-align: center;">(0.18)</td>
+<td style="text-align: center;">(0.17)</td>
+<td style="text-align: center;">(0.35)</td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(0.75)</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR100</td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">13.69</td>
+<td style="text-align: center;">11.51</td>
+<td style="text-align: center;">23.61</td>
+<td style="text-align: center;">13.10</td>
+<td style="text-align: center;">14.60</td>
+<td style="text-align: center;">10.14</td>
+<td style="text-align: center;">9.85</td>
+<td style="text-align: center;">5.50</td>
+<td style="text-align: center;">4.75</td>
+<td style="text-align: center;">4.72</td>
+<td style="text-align: center;">4.94</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(0.41)</td>
+<td style="text-align: center;">(1.16)</td>
+<td style="text-align: center;">(0.80)</td>
+<td style="text-align: center;">(0.77)</td>
+<td style="text-align: center;">(0.64)</td>
+<td style="text-align: center;">(0.57)</td>
+<td style="text-align: center;">(0.70)</td>
+<td style="text-align: center;">(0.73)</td>
+<td style="text-align: center;">(0.74)</td>
+<td style="text-align: center;">(0.74)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet200</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">12.37</td>
+<td style="text-align: center;">8.19</td>
+<td style="text-align: center;">22.07</td>
+<td style="text-align: center;">8.61</td>
+<td style="text-align: center;">15.17</td>
+<td style="text-align: center;">7.81</td>
+<td style="text-align: center;">5.13</td>
+<td style="text-align: center;">4.37</td>
+<td style="text-align: center;">2.04</td>
+<td style="text-align: center;">3.79</td>
+<td style="text-align: center;">1.45</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.08)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.11)</td>
+<td style="text-align: center;">(0.29)</td>
+<td style="text-align: center;">(0.08)</td>
+<td style="text-align: center;">(0.39)</td>
+<td style="text-align: center;">(0.24)</td>
+<td style="text-align: center;">(0.30)</td>
+<td style="text-align: center;">(0.27)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">19.86</td>
+<td style="text-align: center;">12.94</td>
+<td style="text-align: center;">32.44</td>
+<td style="text-align: center;">13.35</td>
+<td style="text-align: center;">25.02</td>
+<td style="text-align: center;">12.38</td>
+<td style="text-align: center;">5.41</td>
+<td style="text-align: center;">5.93</td>
+<td style="text-align: center;">3.09</td>
+<td style="text-align: center;">5.00</td>
+<td style="text-align: center;">2.68</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(1.38)</td>
+<td style="text-align: center;">(1.81)</td>
+<td style="text-align: center;">(1.00)</td>
+<td style="text-align: center;">(1.30)</td>
+<td style="text-align: center;">(1.10)</td>
+<td style="text-align: center;">(1.38)</td>
+<td style="text-align: center;">(0.89)</td>
+<td style="text-align: center;">(1.38)</td>
+<td style="text-align: center;">(0.87)</td>
+<td style="text-align: center;">(1.28)</td>
+<td style="text-align: center;">(0.45)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">7.77</td>
+<td style="text-align: center;">6.50</td>
+<td style="text-align: center;">18.13</td>
+<td style="text-align: center;">6.02</td>
+<td style="text-align: center;">8.13</td>
+<td style="text-align: center;">5.76</td>
+<td style="text-align: center;">6.23</td>
+<td style="text-align: center;">3.88</td>
+<td style="text-align: center;">2.17</td>
+<td style="text-align: center;">2.06</td>
+<td style="text-align: center;">0.80</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.27)</td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.23)</td>
+<td style="text-align: center;">(0.34)</td>
+<td style="text-align: center;">(0.27)</td>
+<td style="text-align: center;">(0.37)</td>
+<td style="text-align: center;">(0.41)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.62)</td>
+<td style="text-align: center;">(0.54)</td>
+<td style="text-align: center;">(0.44)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">13.39</td>
+<td style="text-align: center;">10.12</td>
+<td style="text-align: center;">24.62</td>
+<td style="text-align: center;">8.51</td>
+<td style="text-align: center;">13.55</td>
+<td style="text-align: center;">7.90</td>
+<td style="text-align: center;">6.32</td>
+<td style="text-align: center;">3.34</td>
+<td style="text-align: center;">2.53</td>
+<td style="text-align: center;">2.61</td>
+<td style="text-align: center;">4.89</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.63)</td>
+<td style="text-align: center;">(0.64)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.61)</td>
+<td style="text-align: center;">(0.72)</td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.36)</td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.83)</td>
+</tr>
+<tr>
+<td style="text-align: center;">FMoW-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">5.53</td>
+<td style="text-align: center;">4.31</td>
+<td style="text-align: center;">33.53</td>
+<td style="text-align: center;">12.84</td>
+<td style="text-align: center;">5.94</td>
+<td style="text-align: center;">4.45</td>
+<td style="text-align: center;">5.74</td>
+<td style="text-align: center;">3.06</td>
+<td style="text-align: center;">2.70</td>
+<td style="text-align: center;">3.02</td>
+<td style="text-align: center;">2.72</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.63)</td>
+<td style="text-align: center;">(0.13)</td>
+<td style="text-align: center;">(12.06)</td>
+<td style="text-align: center;">(0.36)</td>
+<td style="text-align: center;">(0.77)</td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(0.36)</td>
+<td style="text-align: center;">(0.54)</td>
+<td style="text-align: center;">(0.35)</td>
+<td style="text-align: center;">(0.44)</td>
+</tr>
+<tr>
+<td style="text-align: center;">RxRx1-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">5.80</td>
+<td style="text-align: center;">5.72</td>
+<td style="text-align: center;">7.90</td>
+<td style="text-align: center;">4.84</td>
+<td style="text-align: center;">5.98</td>
+<td style="text-align: center;">5.98</td>
+<td style="text-align: center;">6.03</td>
+<td style="text-align: center;">4.66</td>
+<td style="text-align: center;">4.56</td>
+<td style="text-align: center;">4.41</td>
+<td style="text-align: center;">4.47</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.17)</td>
+<td style="text-align: center;">(0.15)</td>
+<td style="text-align: center;">(0.24)</td>
+<td style="text-align: center;">(0.09)</td>
+<td style="text-align: center;">(0.15)</td>
+<td style="text-align: center;">(0.13)</td>
+<td style="text-align: center;">(0.08)</td>
+<td style="text-align: center;">(0.38)</td>
+<td style="text-align: center;">(0.38)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.26)</td>
+</tr>
+<tr>
+<td style="text-align: center;">Amazon-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">2.40</td>
+<td style="text-align: center;">2.29</td>
+<td style="text-align: center;">8.01</td>
+<td style="text-align: center;">2.38</td>
+<td style="text-align: center;">2.40</td>
+<td style="text-align: center;">2.28</td>
+<td style="text-align: center;">17.87</td>
+<td style="text-align: center;">1.65</td>
+<td style="text-align: center;">1.62</td>
+<td style="text-align: center;">1.60</td>
+<td style="text-align: center;">1.59</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.08)</td>
+<td style="text-align: center;">(0.09)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.17)</td>
+<td style="text-align: center;">(0.09)</td>
+<td style="text-align: center;">(0.09)</td>
+<td style="text-align: center;">(0.18)</td>
+<td style="text-align: center;">(0.06)</td>
+<td style="text-align: center;">(0.05)</td>
+<td style="text-align: center;">(0.14)</td>
+<td style="text-align: center;">(0.15)</td>
+</tr>
+<tr>
+<td style="text-align: center;">CivilCom.-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">12.64</td>
+<td style="text-align: center;">10.80</td>
+<td style="text-align: center;">16.76</td>
+<td style="text-align: center;">11.03</td>
+<td style="text-align: center;">13.31</td>
+<td style="text-align: center;">10.99</td>
+<td style="text-align: center;">16.65</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">7.14</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.52)</td>
+<td style="text-align: center;">(0.48)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.49)</td>
+<td style="text-align: center;">(0.52)</td>
+<td style="text-align: center;">(0.49)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.41)</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">MNIST</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">18.48</td>
+<td style="text-align: center;">15.99</td>
+<td style="text-align: center;">21.17</td>
+<td style="text-align: center;">14.81</td>
+<td style="text-align: center;">20.19</td>
+<td style="text-align: center;">14.56</td>
+<td style="text-align: center;">24.42</td>
+<td style="text-align: center;">5.02</td>
+<td style="text-align: center;">2.40</td>
+<td style="text-align: center;">3.14</td>
+<td style="text-align: center;">3.50</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.45)</td>
+<td style="text-align: center;">(1.53)</td>
+<td style="text-align: center;">(0.24)</td>
+<td style="text-align: center;">(3.89)</td>
+<td style="text-align: center;">(0.23)</td>
+<td style="text-align: center;">(3.47)</td>
+<td style="text-align: center;">(0.41)</td>
+<td style="text-align: center;">(0.44)</td>
+<td style="text-align: center;">(1.83)</td>
+<td style="text-align: center;">(0.49)</td>
+<td style="text-align: center;">(0.17)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ENTITY-13</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">16.23</td>
+<td style="text-align: center;">11.14</td>
+<td style="text-align: center;">24.97</td>
+<td style="text-align: center;">10.88</td>
+<td style="text-align: center;">19.08</td>
+<td style="text-align: center;">10.47</td>
+<td style="text-align: center;">10.71</td>
+<td style="text-align: center;">5.39</td>
+<td style="text-align: center;">3.88</td>
+<td style="text-align: center;">4.58</td>
+<td style="text-align: center;">4.19</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.77)</td>
+<td style="text-align: center;">(0.65)</td>
+<td style="text-align: center;">(0.70)</td>
+<td style="text-align: center;">(0.77)</td>
+<td style="text-align: center;">(0.65)</td>
+<td style="text-align: center;">(0.72)</td>
+<td style="text-align: center;">(0.74)</td>
+<td style="text-align: center;">(0.92)</td>
+<td style="text-align: center;">(0.61)</td>
+<td style="text-align: center;">(0.85)</td>
+<td style="text-align: center;">(0.16)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">28.53</td>
+<td style="text-align: center;">22.02</td>
+<td style="text-align: center;">38.33</td>
+<td style="text-align: center;">21.64</td>
+<td style="text-align: center;">32.43</td>
+<td style="text-align: center;">21.22</td>
+<td style="text-align: center;">20.61</td>
+<td style="text-align: center;">13.58</td>
+<td style="text-align: center;">10.28</td>
+<td style="text-align: center;">12.25</td>
+<td style="text-align: center;">6.63</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.82)</td>
+<td style="text-align: center;">(0.68)</td>
+<td style="text-align: center;">(0.75)</td>
+<td style="text-align: center;">(0.86)</td>
+<td style="text-align: center;">(0.69)</td>
+<td style="text-align: center;">(0.80)</td>
+<td style="text-align: center;">(0.60)</td>
+<td style="text-align: center;">(1.15)</td>
+<td style="text-align: center;">(1.34)</td>
+<td style="text-align: center;">(1.21)</td>
+<td style="text-align: center;">(0.93)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ENTITY-30</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">18.59</td>
+<td style="text-align: center;">14.46</td>
+<td style="text-align: center;">28.82</td>
+<td style="text-align: center;">14.30</td>
+<td style="text-align: center;">21.63</td>
+<td style="text-align: center;">13.46</td>
+<td style="text-align: center;">12.92</td>
+<td style="text-align: center;">9.12</td>
+<td style="text-align: center;">7.75</td>
+<td style="text-align: center;">8.15</td>
+<td style="text-align: center;">7.64</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.51)</td>
+<td style="text-align: center;">(0.52)</td>
+<td style="text-align: center;">(0.43)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.37)</td>
+<td style="text-align: center;">(0.59)</td>
+<td style="text-align: center;">(0.14)</td>
+<td style="text-align: center;">(0.62)</td>
+<td style="text-align: center;">(0.72)</td>
+<td style="text-align: center;">(0.68)</td>
+<td style="text-align: center;">(0.88)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">32.34</td>
+<td style="text-align: center;">26.85</td>
+<td style="text-align: center;">44.02</td>
+<td style="text-align: center;">26.27</td>
+<td style="text-align: center;">36.82</td>
+<td style="text-align: center;">25.42</td>
+<td style="text-align: center;">23.16</td>
+<td style="text-align: center;">17.75</td>
+<td style="text-align: center;">14.30</td>
+<td style="text-align: center;">15.60</td>
+<td style="text-align: center;">10.57</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.60)</td>
+<td style="text-align: center;">(0.58)</td>
+<td style="text-align: center;">(0.56)</td>
+<td style="text-align: center;">(0.79)</td>
+<td style="text-align: center;">(0.47)</td>
+<td style="text-align: center;">(0.68)</td>
+<td style="text-align: center;">(0.12)</td>
+<td style="text-align: center;">(0.76)</td>
+<td style="text-align: center;">(0.85)</td>
+<td style="text-align: center;">(0.86)</td>
+<td style="text-align: center;">(0.86)</td>
+</tr>
+<tr>
+<td style="text-align: center;">NONLIVING-26</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">18.66</td>
+<td style="text-align: center;">17.17</td>
+<td style="text-align: center;">26.39</td>
+<td style="text-align: center;">16.14</td>
+<td style="text-align: center;">19.86</td>
+<td style="text-align: center;">15.58</td>
+<td style="text-align: center;">16.63</td>
+<td style="text-align: center;">10.87</td>
+<td style="text-align: center;">10.24</td>
+<td style="text-align: center;">10.07</td>
+<td style="text-align: center;">10.26</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.76)</td>
+<td style="text-align: center;">(0.74)</td>
+<td style="text-align: center;">(0.82)</td>
+<td style="text-align: center;">(0.81)</td>
+<td style="text-align: center;">(0.67)</td>
+<td style="text-align: center;">(0.76)</td>
+<td style="text-align: center;">(0.45)</td>
+<td style="text-align: center;">(0.98)</td>
+<td style="text-align: center;">(0.83)</td>
+<td style="text-align: center;">(0.92)</td>
+<td style="text-align: center;">(1.18)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">33.43</td>
+<td style="text-align: center;">31.53</td>
+<td style="text-align: center;">41.66</td>
+<td style="text-align: center;">29.87</td>
+<td style="text-align: center;">35.13</td>
+<td style="text-align: center;">29.31</td>
+<td style="text-align: center;">29.56</td>
+<td style="text-align: center;">21.70</td>
+<td style="text-align: center;">20.12</td>
+<td style="text-align: center;">19.08</td>
+<td style="text-align: center;">18.26</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.67)</td>
+<td style="text-align: center;">(0.65)</td>
+<td style="text-align: center;">(0.67)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.54)</td>
+<td style="text-align: center;">(0.64)</td>
+<td style="text-align: center;">(0.21)</td>
+<td style="text-align: center;">(0.86)</td>
+<td style="text-align: center;">(0.75)</td>
+<td style="text-align: center;">(0.82)</td>
+<td style="text-align: center;">(1.12)</td>
+</tr>
+<tr>
+<td style="text-align: center;">LIVING-17</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">12.63</td>
+<td style="text-align: center;">11.05</td>
+<td style="text-align: center;">18.32</td>
+<td style="text-align: center;">10.46</td>
+<td style="text-align: center;">14.43</td>
+<td style="text-align: center;">10.14</td>
+<td style="text-align: center;">9.87</td>
+<td style="text-align: center;">4.57</td>
+<td style="text-align: center;">3.95</td>
+<td style="text-align: center;">3.81</td>
+<td style="text-align: center;">4.21</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(1.25)</td>
+<td style="text-align: center;">(1.20)</td>
+<td style="text-align: center;">(1.01)</td>
+<td style="text-align: center;">(1.12)</td>
+<td style="text-align: center;">(1.11)</td>
+<td style="text-align: center;">(1.16)</td>
+<td style="text-align: center;">(0.61)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.48)</td>
+<td style="text-align: center;">(0.22)</td>
+<td style="text-align: center;">(0.53)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">29.03</td>
+<td style="text-align: center;">26.96</td>
+<td style="text-align: center;">35.67</td>
+<td style="text-align: center;">26.11</td>
+<td style="text-align: center;">31.73</td>
+<td style="text-align: center;">25.73</td>
+<td style="text-align: center;">23.53</td>
+<td style="text-align: center;">16.15</td>
+<td style="text-align: center;">14.49</td>
+<td style="text-align: center;">12.97</td>
+<td style="text-align: center;">11.39</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(1.44)</td>
+<td style="text-align: center;">(1.38)</td>
+<td style="text-align: center;">(1.09)</td>
+<td style="text-align: center;">(1.27)</td>
+<td style="text-align: center;">(1.19)</td>
+<td style="text-align: center;">(1.35)</td>
+<td style="text-align: center;">(0.52)</td>
+<td style="text-align: center;">(1.36)</td>
+<td style="text-align: center;">(1.46)</td>
+<td style="text-align: center;">(1.52)</td>
+<td style="text-align: center;">(1.72)</td>
+</tr>
+</tbody>
+</table>
+<p>Table 3: Mean Absolute estimation Error (MAE) results for different
+datasets in our setup grouped by the nature of shift. ‘Same’ refers to
+same subpopulation shifts and ‘Novel’ refers novel subpopulation shifts.
+We include details about the target sets considered in each shift in
+Table 2. Post T denotes use of TS calibration on source. For language
+datasets, we use DistilBERT-base-uncased, for vision dataset we report
+results with DenseNet model with the exception of MNIST where we use
+FCN. Across all datasets, we observe that ATC achieves superior
+performance (lower MAE is better). For GDE post T and pre T estimates
+match since TS doesn’t alter the argmax prediction. Results reported by
+aggregating MAE numbers over 4 different seeds. Values in parenthesis
+(i.e., <span class="math inline">$\cdot$</span> ) denote standard
+deviation values.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+<col style="width: 7%"/>
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Dataset</th>
+<th style="text-align: center;">Shift</th>
+<th style="text-align: center;">IM</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">AC</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">DOC</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">GDE</th>
+<th style="text-align: center;">ATC-MC (Ours)</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">ATC-NE (Ours)</th>
+<th style="text-align: center;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+<td style="text-align: center;">Pre T</td>
+<td style="text-align: center;">Post T</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR10</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">7.14</td>
+<td style="text-align: center;">6.20</td>
+<td style="text-align: center;">10.25</td>
+<td style="text-align: center;">7.06</td>
+<td style="text-align: center;">7.68</td>
+<td style="text-align: center;">6.35</td>
+<td style="text-align: center;">5.74</td>
+<td style="text-align: center;">4.02</td>
+<td style="text-align: center;">3.85</td>
+<td style="text-align: center;">3.76</td>
+<td style="text-align: center;">3.38</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.14)</td>
+<td style="text-align: center;">(0.11)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.28)</td>
+<td style="text-align: center;">(0.27)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.38)</td>
+<td style="text-align: center;">(0.30)</td>
+<td style="text-align: center;">(0.33)</td>
+<td style="text-align: center;">(0.32)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">12.62</td>
+<td style="text-align: center;">10.75</td>
+<td style="text-align: center;">16.50</td>
+<td style="text-align: center;">11.91</td>
+<td style="text-align: center;">13.93</td>
+<td style="text-align: center;">11.20</td>
+<td style="text-align: center;">7.97</td>
+<td style="text-align: center;">5.66</td>
+<td style="text-align: center;">5.03</td>
+<td style="text-align: center;">4.87</td>
+<td style="text-align: center;">3.63</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.76)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.28)</td>
+<td style="text-align: center;">(0.24)</td>
+<td style="text-align: center;">(0.29)</td>
+<td style="text-align: center;">(0.28)</td>
+<td style="text-align: center;">(0.13)</td>
+<td style="text-align: center;">(0.64)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.71)</td>
+<td style="text-align: center;">(0.62)</td>
+</tr>
+<tr>
+<td style="text-align: center;">CIFAR100</td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">12.77</td>
+<td style="text-align: center;">12.34</td>
+<td style="text-align: center;">16.89</td>
+<td style="text-align: center;">12.73</td>
+<td style="text-align: center;">11.18</td>
+<td style="text-align: center;">9.63</td>
+<td style="text-align: center;">12.00</td>
+<td style="text-align: center;">5.61</td>
+<td style="text-align: center;">5.55</td>
+<td style="text-align: center;">5.65</td>
+<td style="text-align: center;">5.76</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.43)</td>
+<td style="text-align: center;">(0.68)</td>
+<td style="text-align: center;">(0.20)</td>
+<td style="text-align: center;">(2.59)</td>
+<td style="text-align: center;">(0.35)</td>
+<td style="text-align: center;">(1.25)</td>
+<td style="text-align: center;">(0.48)</td>
+<td style="text-align: center;">(0.51)</td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(0.35)</td>
+<td style="text-align: center;">(0.27)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet200</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">12.63</td>
+<td style="text-align: center;">7.99</td>
+<td style="text-align: center;">23.08</td>
+<td style="text-align: center;">7.22</td>
+<td style="text-align: center;">15.40</td>
+<td style="text-align: center;">6.33</td>
+<td style="text-align: center;">5.00</td>
+<td style="text-align: center;">4.60</td>
+<td style="text-align: center;">1.80</td>
+<td style="text-align: center;">4.06</td>
+<td style="text-align: center;">1.38</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.59)</td>
+<td style="text-align: center;">(0.47)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.22)</td>
+<td style="text-align: center;">(0.42)</td>
+<td style="text-align: center;">(0.24)</td>
+<td style="text-align: center;">(0.36)</td>
+<td style="text-align: center;">(0.63)</td>
+<td style="text-align: center;">(0.17)</td>
+<td style="text-align: center;">(0.69)</td>
+<td style="text-align: center;">(0.29)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">20.17</td>
+<td style="text-align: center;">11.74</td>
+<td style="text-align: center;">33.69</td>
+<td style="text-align: center;">9.51</td>
+<td style="text-align: center;">25.49</td>
+<td style="text-align: center;">8.61</td>
+<td style="text-align: center;">4.19</td>
+<td style="text-align: center;">5.37</td>
+<td style="text-align: center;">2.78</td>
+<td style="text-align: center;">4.53</td>
+<td style="text-align: center;">3.58</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.74)</td>
+<td style="text-align: center;">(0.80)</td>
+<td style="text-align: center;">(0.73)</td>
+<td style="text-align: center;">(0.51)</td>
+<td style="text-align: center;">(0.66)</td>
+<td style="text-align: center;">(0.50)</td>
+<td style="text-align: center;">(0.14)</td>
+<td style="text-align: center;">(0.88)</td>
+<td style="text-align: center;">(0.23)</td>
+<td style="text-align: center;">(0.79)</td>
+<td style="text-align: center;">(0.33)</td>
+</tr>
+<tr>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">8.09</td>
+<td style="text-align: center;">6.42</td>
+<td style="text-align: center;">21.66</td>
+<td style="text-align: center;">5.91</td>
+<td style="text-align: center;">8.53</td>
+<td style="text-align: center;">5.21</td>
+<td style="text-align: center;">5.90</td>
+<td style="text-align: center;">3.93</td>
+<td style="text-align: center;">1.89</td>
+<td style="text-align: center;">2.45</td>
+<td style="text-align: center;">0.73</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.28)</td>
+<td style="text-align: center;">(0.38)</td>
+<td style="text-align: center;">(0.22)</td>
+<td style="text-align: center;">(0.26)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.44)</td>
+<td style="text-align: center;">(0.26)</td>
+<td style="text-align: center;">(0.21)</td>
+<td style="text-align: center;">(0.16)</td>
+<td style="text-align: center;">(0.10)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Synthetic</td>
+<td style="text-align: center;">13.93</td>
+<td style="text-align: center;">9.90</td>
+<td style="text-align: center;">28.05</td>
+<td style="text-align: center;">7.56</td>
+<td style="text-align: center;">13.82</td>
+<td style="text-align: center;">6.19</td>
+<td style="text-align: center;">6.70</td>
+<td style="text-align: center;">3.33</td>
+<td style="text-align: center;">2.55</td>
+<td style="text-align: center;">2.12</td>
+<td style="text-align: center;">5.06</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.14)</td>
+<td style="text-align: center;">(0.23)</td>
+<td style="text-align: center;">(0.39)</td>
+<td style="text-align: center;">(0.13)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.07)</td>
+<td style="text-align: center;">(0.52)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.27)</td>
+</tr>
+<tr>
+<td style="text-align: center;">FMoW-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">5.15</td>
+<td style="text-align: center;">3.55</td>
+<td style="text-align: center;">34.64</td>
+<td style="text-align: center;">5.03</td>
+<td style="text-align: center;">5.58</td>
+<td style="text-align: center;">3.46</td>
+<td style="text-align: center;">5.08</td>
+<td style="text-align: center;">2.59</td>
+<td style="text-align: center;">2.33</td>
+<td style="text-align: center;">2.52</td>
+<td style="text-align: center;">2.22</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.19)</td>
+<td style="text-align: center;">(0.41)</td>
+<td style="text-align: center;">(0.22)</td>
+<td style="text-align: center;">(0.29)</td>
+<td style="text-align: center;">(0.17)</td>
+<td style="text-align: center;">(0.37)</td>
+<td style="text-align: center;">(0.46)</td>
+<td style="text-align: center;">(0.32)</td>
+<td style="text-align: center;">(0.28)</td>
+<td style="text-align: center;">(0.25)</td>
+<td style="text-align: center;">(0.30)</td>
+</tr>
+<tr>
+<td style="text-align: center;">RxRx1-WILDS</td>
+<td style="text-align: center;">Natural</td>
+<td style="text-align: center;">6.17</td>
+<td style="text-align: center;">6.11</td>
+<td style="text-align: center;">21.05</td>
+<td style="text-align: center;">5.21</td>
+<td style="text-align: center;">6.54</td>
+<td style="text-align: center;">6.27</td>
+<td style="text-align: center;">6.82</td>
+<td style="text-align: center;">5.30</td>
+<td style="text-align: center;">5.20</td>
+<td style="text-align: center;">5.19</td>
+<td style="text-align: center;">5.63</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.20)</td>
+<td style="text-align: center;">(0.24)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.18)</td>
+<td style="text-align: center;">(0.21)</td>
+<td style="text-align: center;">(0.20)</td>
+<td style="text-align: center;">(0.31)</td>
+<td style="text-align: center;">(0.30)</td>
+<td style="text-align: center;">(0.44)</td>
+<td style="text-align: center;">(0.43)</td>
+<td style="text-align: center;">(0.55)</td>
+</tr>
+<tr>
+<td style="text-align: center;">Entity-13</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">18.32</td>
+<td style="text-align: center;">14.38</td>
+<td style="text-align: center;">27.79</td>
+<td style="text-align: center;">13.56</td>
+<td style="text-align: center;">20.50</td>
+<td style="text-align: center;">13.22</td>
+<td style="text-align: center;">16.09</td>
+<td style="text-align: center;">9.35</td>
+<td style="text-align: center;">7.50</td>
+<td style="text-align: center;">7.80</td>
+<td style="text-align: center;">6.94</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.29)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(1.18)</td>
+<td style="text-align: center;">(0.58)</td>
+<td style="text-align: center;">(0.47)</td>
+<td style="text-align: center;">(0.58)</td>
+<td style="text-align: center;">(0.84)</td>
+<td style="text-align: center;">(0.79)</td>
+<td style="text-align: center;">(0.65)</td>
+<td style="text-align: center;">(0.62)</td>
+<td style="text-align: center;">(0.71)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">28.82</td>
+<td style="text-align: center;">24.03</td>
+<td style="text-align: center;">38.97</td>
+<td style="text-align: center;">22.96</td>
+<td style="text-align: center;">31.66</td>
+<td style="text-align: center;">22.61</td>
+<td style="text-align: center;">25.26</td>
+<td style="text-align: center;">17.11</td>
+<td style="text-align: center;">13.96</td>
+<td style="text-align: center;">14.75</td>
+<td style="text-align: center;">9.94</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.30)</td>
+<td style="text-align: center;">(0.55)</td>
+<td style="text-align: center;">(1.32)</td>
+<td style="text-align: center;">(0.59)</td>
+<td style="text-align: center;">(0.54)</td>
+<td style="text-align: center;">(0.58)</td>
+<td style="text-align: center;">(1.08)</td>
+<td style="text-align: center;">(0.93)</td>
+<td style="text-align: center;">(0.64)</td>
+<td style="text-align: center;">(0.78)</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">Entity-30</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">16.91</td>
+<td style="text-align: center;">14.61</td>
+<td style="text-align: center;">26.84</td>
+<td style="text-align: center;">14.37</td>
+<td style="text-align: center;">18.60</td>
+<td style="text-align: center;">13.11</td>
+<td style="text-align: center;">13.74</td>
+<td style="text-align: center;">8.54</td>
+<td style="text-align: center;">7.94</td>
+<td style="text-align: center;">7.77</td>
+<td style="text-align: center;">8.04</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(1.33)</td>
+<td style="text-align: center;">(1.11)</td>
+<td style="text-align: center;">(2.15)</td>
+<td style="text-align: center;">(1.34)</td>
+<td style="text-align: center;">(1.69)</td>
+<td style="text-align: center;">(1.30)</td>
+<td style="text-align: center;">(1.07)</td>
+<td style="text-align: center;">(1.47)</td>
+<td style="text-align: center;">(1.38)</td>
+<td style="text-align: center;">(1.44)</td>
+<td style="text-align: center;">(1.51)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">28.66</td>
+<td style="text-align: center;">25.83</td>
+<td style="text-align: center;">39.21</td>
+<td style="text-align: center;">25.03</td>
+<td style="text-align: center;">30.95</td>
+<td style="text-align: center;">23.73</td>
+<td style="text-align: center;">23.15</td>
+<td style="text-align: center;">15.57</td>
+<td style="text-align: center;">13.24</td>
+<td style="text-align: center;">12.44</td>
+<td style="text-align: center;">11.05</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(1.16)</td>
+<td style="text-align: center;">(0.88)</td>
+<td style="text-align: center;">(2.03)</td>
+<td style="text-align: center;">(1.11)</td>
+<td style="text-align: center;">(1.64)</td>
+<td style="text-align: center;">(1.11)</td>
+<td style="text-align: center;">(0.51)</td>
+<td style="text-align: center;">(1.44)</td>
+<td style="text-align: center;">(1.15)</td>
+<td style="text-align: center;">(1.26)</td>
+<td style="text-align: center;">(1.13)</td>
+</tr>
+<tr>
+<td style="text-align: center;">NonLIVING-26</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">17.43</td>
+<td style="text-align: center;">15.95</td>
+<td style="text-align: center;">27.70</td>
+<td style="text-align: center;">15.40</td>
+<td style="text-align: center;">18.06</td>
+<td style="text-align: center;">14.58</td>
+<td style="text-align: center;">16.99</td>
+<td style="text-align: center;">10.79</td>
+<td style="text-align: center;">10.13</td>
+<td style="text-align: center;">10.05</td>
+<td style="text-align: center;">10.29</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.90)</td>
+<td style="text-align: center;">(0.86)</td>
+<td style="text-align: center;">(0.90)</td>
+<td style="text-align: center;">(0.69)</td>
+<td style="text-align: center;">(1.00)</td>
+<td style="text-align: center;">(0.78)</td>
+<td style="text-align: center;">(1.25)</td>
+<td style="text-align: center;">(0.62)</td>
+<td style="text-align: center;">(0.32)</td>
+<td style="text-align: center;">(0.46)</td>
+<td style="text-align: center;">(0.79)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">29.51</td>
+<td style="text-align: center;">27.75</td>
+<td style="text-align: center;">40.02</td>
+<td style="text-align: center;">26.77</td>
+<td style="text-align: center;">30.36</td>
+<td style="text-align: center;">25.93</td>
+<td style="text-align: center;">27.70</td>
+<td style="text-align: center;">19.64</td>
+<td style="text-align: center;">17.75</td>
+<td style="text-align: center;">16.90</td>
+<td style="text-align: center;">15.69</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.86)</td>
+<td style="text-align: center;">(0.82)</td>
+<td style="text-align: center;">(0.76)</td>
+<td style="text-align: center;">(0.82)</td>
+<td style="text-align: center;">(0.95)</td>
+<td style="text-align: center;">(0.80)</td>
+<td style="text-align: center;">(1.42)</td>
+<td style="text-align: center;">(0.68)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.60)</td>
+<td style="text-align: center;">(0.83)</td>
+</tr>
+<tr>
+<td style="text-align: center;">LIVING-17</td>
+<td style="text-align: center;">Same</td>
+<td style="text-align: center;">14.28</td>
+<td style="text-align: center;">12.21</td>
+<td style="text-align: center;">23.46</td>
+<td style="text-align: center;">11.16</td>
+<td style="text-align: center;">15.22</td>
+<td style="text-align: center;">10.78</td>
+<td style="text-align: center;">10.49</td>
+<td style="text-align: center;">4.92</td>
+<td style="text-align: center;">4.23</td>
+<td style="text-align: center;">4.19</td>
+<td style="text-align: center;">4.73</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.96)</td>
+<td style="text-align: center;">(0.93)</td>
+<td style="text-align: center;">(1.16)</td>
+<td style="text-align: center;">(0.90)</td>
+<td style="text-align: center;">(0.96)</td>
+<td style="text-align: center;">(0.99)</td>
+<td style="text-align: center;">(0.97)</td>
+<td style="text-align: center;">(0.57)</td>
+<td style="text-align: center;">(0.42)</td>
+<td style="text-align: center;">(0.35)</td>
+<td style="text-align: center;">(0.24)</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Novel</td>
+<td style="text-align: center;">28.91</td>
+<td style="text-align: center;">26.35</td>
+<td style="text-align: center;">38.62</td>
+<td style="text-align: center;">24.91</td>
+<td style="text-align: center;">30.32</td>
+<td style="text-align: center;">24.52</td>
+<td style="text-align: center;">22.49</td>
+<td style="text-align: center;">15.42</td>
+<td style="text-align: center;">13.02</td>
+<td style="text-align: center;">12.29</td>
+<td style="text-align: center;">10.34</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">(0.66)</td>
+<td style="text-align: center;">(0.73)</td>
+<td style="text-align: center;">(1.01)</td>
+<td style="text-align: center;">(0.61)</td>
+<td style="text-align: center;">(0.59)</td>
+<td style="text-align: center;">(0.74)</td>
+<td style="text-align: center;">(0.85)</td>
+<td style="text-align: center;">(0.59)</td>
+<td style="text-align: center;">(0.53)</td>
+<td style="text-align: center;">(0.73)</td>
+<td style="text-align: center;">(0.62)</td>
+</tr>
+</tbody>
+</table>
+<p>Table 4: Mean Absolute estimation Error (MAE) results for different
+datasets in our setup grouped by the nature of shift for ResNet model.
+‘Same’ refers to same subpopulation shifts and ‘Novel’ refers novel
+subpopulation shifts. We include details about the target sets
+considered in each shift in Table 2. Post T denotes use of TS
+calibration on source. Across all datasets, we observe that ATC achieves
+superior performance (lower MAE is better). For GDE post T and pre T
+estimates match since TS doesn’t alter the argmax prediction. Results
+reported by aggregating MAE numbers over 4 different seeds. Values in
+parenthesis (i.e., <span class="math inline">$\cdot$</span> ) denote
+standard deviation values.</p>
+</body>
+</html>
