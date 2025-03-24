@@ -72,7 +72,7 @@ There is a set of alternative scripts that use Mistral's API to convert from PDF
 ### Step 1: Convert PDF to Markdown
 
 ```bash
-python agentic-pdf-markdown.py path/to/your/document.pdf output_markdown.md
+python agentic-pdf-markdown.py path/to/your/document.pdf -o output_markdown.md
 ```
 
 This step uses the Agentic Document Extraction API to convert the PDF into markdown format with properly extracted text and structure.

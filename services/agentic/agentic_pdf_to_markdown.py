@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
 
 import os
-import sys
-import argparse
 import requests
 import json
-import time
-from datetime import datetime
 
-class PDFToMarkdownConverter:
+API_KEY = os.environ.get("AGENTIC_API_KEY")
+
+class AgenticPDFToMarkdownConverter:
     """
     A converter that uses the Agentic Document Extraction API to extract content from PDFs
     and save it as Markdown files.
     """
-    
-    def __init__(self, api_key):
-        self.api_key = api_key
+    def __init__(self):
+        self.api_key = API_KEY
         # Updated URL based on the documentation
         self.base_url = "https://api.va.landing.ai/v1/tools/agentic-document-analysis"
         # Updated headers based on the documentation
         self.headers = {
             "Authorization": f"Basic {self.api_key}"
         }
-    
+     
     def extract_pdf_content(self, pdf_path, output_format="markdown"):
         """
         Send a PDF file to the API for content extraction.
@@ -31,38 +28,45 @@ class PDFToMarkdownConverter:
         print(f"Processing PDF: {pdf_path}")
         
         try:
-            with open(pdf_path, "rb") as pdf_file:
+
+            response = requests.get(pdf_path)
+            response.raise_for_status()  # Raise error if request fails
+
+            # Read PDF from memory
+            pdf_bytes = response.content
+            
+            # with open(pdf_path, "rb") as pdf_file:
                 # Using 'pdf' as the file parameter based on the documentation
-                files = {
-                    "pdf": pdf_file
-                }
+            files = {
+                "pdf": pdf_bytes
+            }
+            
+            # Add any additional parameters you might need
+            params = {
+                "format": output_format
+            }
+            
+            print(f"Sending request to: {self.base_url}")
+            print(f"Authorization: Basic {self.api_key[:5]}...{self.api_key[-5:]}")
+            
+            # Make the API request
+            response = requests.post(
+                self.base_url,
+                headers=self.headers,
+                files=files,
+                params=params
+            )
+            
+            print(f"Response status code: {response.status_code}")
+            
+            if response.status_code == 200:
+                # The request was successful
+                return response.json()
+            else:
+                print(f"Request failed with status code {response.status_code}")
+                print(f"Response: {response.text}")
+                return None
                 
-                # Add any additional parameters you might need
-                params = {
-                    "format": output_format
-                }
-                
-                print(f"Sending request to: {self.base_url}")
-                print(f"Authorization: Basic {self.api_key[:5]}...{self.api_key[-5:]}")
-                
-                # Make the API request
-                response = requests.post(
-                    self.base_url,
-                    headers=self.headers,
-                    files=files,
-                    params=params
-                )
-                
-                print(f"Response status code: {response.status_code}")
-                
-                if response.status_code == 200:
-                    # The request was successful
-                    return response.json()
-                else:
-                    print(f"Request failed with status code {response.status_code}")
-                    print(f"Response: {response.text}")
-                    return None
-                    
         except Exception as e:
             print(f"Error during API request: {str(e)}")
             return None
@@ -133,11 +137,6 @@ class PDFToMarkdownConverter:
         """
         Main method to convert a PDF to Markdown.
         """
-        # Determine output path if not provided
-        if not output_path:
-            base_name = os.path.splitext(os.path.basename(pdf_path))[0]
-            output_path = f"{base_name}.md"
-        
         # Extract content from the PDF
         response = self.extract_pdf_content(pdf_path)
         
@@ -154,41 +153,14 @@ class PDFToMarkdownConverter:
         
         # Extract markdown content from the response
         markdown_content = self.extract_markdown_from_response(response)
-        
-        # Save the markdown content
-        with open(output_path, 'w', encoding='utf-8') as md_file:
-            md_file.write(markdown_content)
-        
-        print(f"Conversion complete! Markdown saved to: {output_path}")
-        return True
+        print(f"Conversion complete!")
+        if output_path:
+            # Save the markdown content
+            with open(output_path, 'w', encoding='utf-8') as md_file:
+                md_file.write(markdown_content)
+            print(f"Markdown saved to: {output_path}")
+            return
+         
+        return markdown_content
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Convert PDF to Markdown using Agentic Document Extraction API")
-    parser.add_argument("pdf_path", help="Path to the PDF file to convert")
-    parser.add_argument("-o", "--output", help="Output Markdown file path (default: same name as PDF with .md extension)")
-    parser.add_argument("-k", "--api-key", help="API key for Agentic Document Extraction API")
-    parser.add_argument("-u", "--api-url", help="Override the API URL")
-    
-    args = parser.parse_args()
-    
-    # Get API key from args or environment variable
-    api_key = args.api_key or os.environ.get("AGENTIC_API_KEY")
-    if not api_key:
-        print("Error: API key not provided. Use --api-key or set AGENTIC_API_KEY environment variable.")
-        return 1
-    
-    converter = PDFToMarkdownConverter(api_key)
-    
-    # Override URL if specified
-    if args.api_url:
-        converter.base_url = args.api_url
-        print(f"Using custom API URL: {args.api_url}")
-    
-    success = converter.convert_pdf_to_markdown(args.pdf_path, args.output)
-    
-    return 0 if success else 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())
