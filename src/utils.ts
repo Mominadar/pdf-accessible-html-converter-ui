@@ -56,5 +56,5 @@ export function timeSince(date: string) {
     if (interval > 1) {
         return Math.floor(interval) + " minute" + (interval < 2 ? "" : "s ago");
     }
-    return Math.floor(seconds) + " second" + (interval < 2 ? "" : "s ago");
+    return Math.floor(seconds) + " second" + (seconds < 2 ? "" : "s ago");
 }

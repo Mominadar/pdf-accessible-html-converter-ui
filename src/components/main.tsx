@@ -43,6 +43,10 @@ const Main = ({ data, loadFiles, isLoading }) => {
                 name="qr-code"
                 placeholder="Enter Pdf URL Manually"
                 value={pdfUrl}
+                isClearable
+                onClear={()=>{
+                    setPdfUrl("");
+                }}
             />
             <CountrySelect value={converter}
                 onChange={(value: SetStateAction<Set<string>>) => {
