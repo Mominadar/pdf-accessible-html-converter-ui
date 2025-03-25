@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.no-colored-shadow {
+  --tw-shadow-colored: none !important;
+}
+
+.drop-zone {
+    border: 2px dashed gray;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+  
+  .drop-zone p {
+    font-size: 16px;
+    color: gray;
+  }
+  
+  .drop-zone:hover {
+    border-color: gray;
+  }
+  
+  .drop-zone.active {
+    border-color: #4caf50;
+  }
+  
+  .file-input {
+    display: none;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    margin: 5px 0;
+  }
+  
