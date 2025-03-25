@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
+logger = Logger(name="S3 Logger")
 logger = Logger.get_logger()
 
 SOURCE_BUCKET_NAME = os.environ["SOURCE_BUCKET_NAME"]
@@ -44,14 +44,19 @@ class S3Client:
     def upload_file(self, url, file):
         try:
             response = requests.put(url, data=file)
-            logger.debug(f"response:  {response.reason}, {response.status_code}")
+            logger.info(f"response:  {response.reason}, {response.status_code}")
         except FileNotFoundError:
             logger.error(
                 f"Couldn't find {url} For a PUT operation, the key must be the "
                 f"name of a file that exists on your computer."
             )
             raise
-
+    
+    def get_put_url(self, get_url):
+        filename = get_url[get_url.rfind("/")+1: get_url.rfind(".pdf")]
+        url = f"https://{TARGET_BUCKET_NAME}.s3.{BUCKET_REGION}.amazonaws.com/{filename}.html"
+        return url
+    
     def get_file(self, url):
         try:
             object_in_s3 = requests.get(url)

@@ -1,4 +1,6 @@
 import json
+from services.db.dynamo import DynamoDBClient
+from services.object_store.S3Client import S3Client
 from utils.helpers import response_object
 from utils.logger import Logger
 from datetime import datetime
@@ -16,7 +18,7 @@ def lambda_handler(event, context):
             
         logger.info(f'Action:  {action}')
         
-        apiClient = ApiService()
+        apiClient = ApiService(DynamoDBClient(), S3Client())
     
         event_body = json.loads(event["body"])
         # event_body = {
@@ -90,56 +92,41 @@ def lambda_handler(event, context):
         #     object_store_client.delete_file(file_name)
         #     return response_object(200, 'file cleared!')
         
-        # elif action == "upload-config":
-        #     scale = event_body["scale"] if "scale" in event_body else 0.5
-        #     source_language = event_body["source_language"]
-        #     get_url = event_body["get_url"]
-        #     username = event_body["username"]
-        #     target_language = event_body["target_language"]
-        #     model = event_body["model_id"] if "model_id" in event_body else None
-        #     region = event_body["region"] if "region" in event_body else None
-        #     original_file_name = event_body["original_file_name"]
+        elif action == "upload-config":
+            scale = event_body["scale"] if "scale" in event_body else 0.5
+            source_language = event_body["source_language"]
+            get_url = event_body["get_url"]
+            username = event_body["username"]
+            target_language = event_body["target_language"]
+            model = event_body["model_id"] if "model_id" in event_body else None
+            region = event_body["region"] if "region" in event_body else None
+            original_file_name = event_body["original_file_name"]
 
-        #     if(not get_url or not source_language or not target_language or not username or not original_file_name or not model):
-        #         return response_object(500, 'Required values not given!')
+            if(not get_url or not source_language or not target_language or not username or not original_file_name or not model):
+                return response_object(500, 'Required values not given!')
                 
-        #     if(not region):
-        #         extra_params = dict()
-        #     if region:
-        #         extra_params={'region': region}
+            if(not region):
+                extra_params = dict()
+            if region:
+                extra_params={'region': region}
                 
-        #     res = apiClient.upload_config(username, get_url, original_file_name, source_language, target_language, model, scale, extra_params)
-        #     return response_object(200, res)
-            
-        # elif action == "custom-prompt":
-        #     logger.info(f'custom-prompt')
-        #     text = event_body["text"]
-        #     result =  apiClient.custom_prompt(text)
-        #     return response_object(200, result)
+            res = apiClient.upload_config(username, get_url, original_file_name, source_language, target_language, model, scale, extra_params)
+            return response_object(200, res)
+       
+        elif action == "get-user-files":
+            username = event_body["username"]
+            if(not username):
+                return response_object(500, "username is required!")
+            files = apiClient.get_file_statuses(username)
+            return response_object(200, files)
         
-        # elif action == "get-user-files":
-        #     username = event_body["username"]
-        #     if(not username):
-        #         return response_object(500, "username is required!")
-        #     files = apiClient.get_file_statuses(username)
-        #     return response_object(200, files)
+        elif action == "get-file":
+            key = event_body["key"]
+            if(not key):
+                raise response_object(400, detail="key is required!")
+            file = apiClient.get_file(key) 
+            return response_object(200, file) 
         
-        # elif action == "get-file":
-        #     key = event_body["key"]
-        #     if(not key):
-        #         raise response_object(400, detail="key is required!")
-        #     file = apiClient.get_file(key) 
-        #     return response_object(200, file) 
-             
-        # elif action == "bedrock-custom-prompt":
-        #     logger.info(f'bedrock custom-prompt')
-        #     text = event_body["text"]
-        #     model = event_body["model"]
-        #     region = event_body["region"]
-        #     bedrock_client = BedRockClient()
-        #     result =  bedrock_client.custom_prompt(text, model, region)
-        #     return response_object(200, result)
-    
         return response_object(500, 'Action is not correct!')       
         
     except Exception as e:

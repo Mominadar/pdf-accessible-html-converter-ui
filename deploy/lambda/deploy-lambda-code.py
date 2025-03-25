@@ -15,7 +15,7 @@ LAMBDA_REGION_NAME = "eu-north-1"
 
 lambda_map = {
     'pdf-accessible-html-convertor': 'main_lambda',
-    #'nllb-backend-async': 'file_lambda'
+    'pdf-accessible-html-convertor-async': 'file_lambda'
 }
 
 def zip_folder(folder_path, zipf, is_recursive=True):

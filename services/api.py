@@ -1,16 +1,95 @@
+import io
 from services.agentic.agentic_service import AgenticService
 from services.mistral.mistral_service import MistralService
+from utils.helpers import get_current_date_str
+from utils.logger import Logger
+
+logger = Logger.get_logger()
 
 class ApiService():
-    def __init__(self):
+    def __init__(self, db_client, object_store_client):
         self.agentic_service = AgenticService()
         self.mistral_service = MistralService()
+        self.db_client = db_client
+        self.object_store_client = object_store_client
 
-    def convert_pdf_to_html(self, converter, pdf_path):
+    def convert_pdf_to_html(self, object_key):
+        config = self.db_client.find_by_id(object_key)
+        converter =  config["converter"]
+        get_url =  config["get_url"]
+        put_url =  config["put_url"]
+        if(not get_url or not put_url or not converter):
+            raise Exception('Something went wrong. Config incomplete!')
+        
+        if converter not in ["agentic", "mistral"]:
+            raise Exception("Invalid converter")
+
+        logger.info(f"Using converter: {converter}")
         if converter == "agentic":
-            return self.agentic_service.convert_pdf_to_html(pdf_path)
+            html = self.agentic_service.convert_pdf_to_html(get_url)
+            return self.upload_html_file(put_url, html)
         elif converter == "mistral":
-            return self.mistral_service.convert_pdf_to_html(pdf_path)
+            html = self.mistral_service.convert_pdf_to_html(get_url)
+        
+        put_url = self.upload_html_file(put_url, html)
+        self.db_client.put(object_key, "file_status", "done")
+        return put_url
 
-        raise Exception("Invalid converter")
+    def upload_html_file(self, put_url, html):
+        html_file = io.StringIO(html)
+        self.object_store_client.upload_file(put_url, html_file)
+        return put_url
+       
+    def upload_config(self, username, original_file_name, get_url, converter):
+        try:
+            if not original_file_name.lower().endswith(".pdf"):
+                raise Exception ("File format not supported")
+            
+            put_url = self.object_store_client.get_put_url(get_url)
+            # store config in db to be picked up when file is processed
+            self.db_client.create({
+                'object_key': {"S" :original_file_name},
+                'username': {"S" : username},
+                'converter' : {"S" : converter},
+                'get_url' : {"S" : get_url},
+                'put_url' : {"S" : put_url},
+                'last_modified_at' : {"S" : get_current_date_str()},
+                'created_at' : {"S" : get_current_date_str()},
+                'file_status': {"S" :"in_progress"},
+            })
+
+            return put_url
+
+        except Exception as e:
+            logger.error(f'Error in upload: {str(e)}')
+            self.db_client.create({
+                'object_key': {"S" : original_file_name},
+                'username': {"S" : username},
+                'converter' : {"S" : converter},
+                'get_url' : {"S" : get_url},
+                'put_url' : {"S" : ""},
+                'last_modified_at' : {"S" : get_current_date_str()},
+                'created_at' : {"S" : get_current_date_str()},
+                'file_status': {"S" :"error"},
+                'error_reason': {"S" :str(e)},
+            })
+            raise
+    
+    def get_file_statuses(self, username):
+        try:
+            files = self.db_client.find('username', username)
+            return files
+
+        except Exception as e:
+            logger.error(f'Error in getting files list: {str(e)}')
+            raise
+    
+    def get_file(self, key):
+        try:
+            file = self.db_client.find_by_id(key)
+            return file
+        except Exception as e:
+            logger.error(f'Error in getting file: {str(e)}')
+            raise
+    
         

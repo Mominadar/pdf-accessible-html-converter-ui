@@ -504,9 +504,7 @@ class MarkdownToHTMLConverter:
         #     markdown_content = f.read()
         
         # 2. Extract and clean title from the markdown content
-        title = self.clean_title_from_comments(markdown_content)
-        print(f"Using title: {title}")
-        
+        title = self.clean_title_from_comments(markdown_content)        
         # 3. Convert markdown to HTML with MathJax
         html_content = self.create_html_with_mathjax(markdown_content, title)
         
