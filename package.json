@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint -c .eslintrc.json ./src/**/**/*.{ts,tsx} --fix",
-    "preview": "vite preview"
+    "dev": "vite --port 5176",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "serve": "vite preview --port 5176 --strictPort --host 0.0.0.0",
+    "start": "NODE_ENV=development concurrently \"vite build --watch\" \"vite preview --port 5176\""
   },
   "dependencies": {
     "@digitalcredentials/ed25519-signature-2020": "^6.0.0",
@@ -25,6 +27,7 @@
     "@heroui/switch": "2.2.8",
     "@heroui/system": "2.4.6",
     "@heroui/theme": "2.4.5",
+    "@originjs/vite-plugin-federation": "^1.4.0",
     "@react-aria/visually-hidden": "3.8.12",
     "@react-pdf/renderer": "^4.3.0",
     "@react-types/shared": "3.26.0",
@@ -32,6 +35,7 @@
     "clsx": "2.1.1",
     "did-jwt-vc": "^4.0.6",
     "dom-to-image": "^2.6.0",
+    "dotenv-expand": "^12.0.1",
     "elliptic": "^6.6.1",
     "ethr-did": "^3.0.25",
     "framer-motion": "11.15.0",
