@@ -1,26 +1,15 @@
 import React from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Pagination,
-  Spinner,
-  Chip,
-  semanticColors,
-} from "@heroui/react";
-import { didRegistryMockData, getAge, getFullName, RegistryEntry } from "@/constants";
+
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { timeSince } from "@/utils";
 import { toast } from "react-toastify";
 import { RiDownload2Fill } from "react-icons/ri";
 import axios from "axios";
+import { Chip, Table, Pagination, TableHeader, TableColumn, TableBody, Spinner, TableRow, TableCell } from "@nextui-org/react";
+import { timeSince } from "../../utils";
 
 export default function TableComponent({ data, isLoading, emptyContent }: { data: any, isLoading: boolean, emptyContent: string }) {
   const [page, setPage] = React.useState(1);
-  const rowsPerPage = 6;
+  const rowsPerPage = 5;
 
 
   const pages = React.useMemo(() => {
@@ -160,7 +149,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
         loadingState={loadingState}
         emptyContent={emptyContent}
       >
-        {items.map((item: RegistryEntry, index: number) => {
+        {items.map((item: any, index: number) => {
           return <TableRow key={item.id} style={{ borderRadius: "1rem", background: "white" }}>
             {columnKeys.map((columnKey) => (<TableCell key={`${item.id}${columnKey}`}>{renderCell(item, columnKey, index)}</TableCell>))}
           </TableRow>

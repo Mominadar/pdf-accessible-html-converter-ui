@@ -2,22 +2,21 @@ import { SetStateAction, useState } from "react";
 //@ts-ignore
 import QrReader from "react-qr-scanner";
 import FileInput from "./common/file-input";
-import { Button } from "@heroui/button";
-import { Card, Divider, Input, semanticColors } from "@heroui/react";
 import { RxReset } from "react-icons/rx";
 import CountrySelect from "./converter-select";
 import TableComponent from "./common/table-component";
-import { convert, getPdfUrl, queueForConversion, uploadFile } from "@/actions";
-import { generateFileNameForUser } from "@/utils";
+import { convert, getPdfUrl, queueForConversion, uploadFile } from "../actions";
 import { toast } from "react-toastify";
-import { getEmail } from "@/constants";
+import { getEmail } from "../constants";
+import { Button, Card, Divider, Input, semanticColors } from "@nextui-org/react";
+import { generateFileNameForUser } from "../utils";
 
 const Main = ({ data, loadFiles, isLoading }) => {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [pdfUrl, setPdfUrl] = useState("");
     const [converter, setConverter] = useState<Set<string>>(new Set());
     return (
-        <Card style={{ width: "70%", padding: "2rem", margin: "0 auto", gap: 20, display: "flex", justifyContent: "center", flexDirection: "column", borderTop: `10px solid ${semanticColors.light.secondary[500]}` }}>
+        <Card style={{ width: "70%", paddingInline: "2rem", paddingTop: "2rem", margin: "0 auto", gap: 15, display: "flex", justifyContent: "center", flexDirection: "column", borderTop: `10px solid ${semanticColors.light.secondary[500]}` }}>
             <FileInput
                 onChange={async (files: any[]) => {
                     try {

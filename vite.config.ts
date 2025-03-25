@@ -1,12 +1,15 @@
-import { defineConfig, transformWithEsbuild } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from "@vitejs/plugin-react";
+import { defineConfig, transformWithEsbuild } from "vite";
 import federation from '@originjs/vite-plugin-federation'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import * as dotenv from 'dotenv';
 import * as dotenvExpand from 'dotenv-expand';
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 dotenvExpand.expand(dotenv.config())
 
+/*
+  custom plugin to transform js to jsx
+*/
 const jsToJsx = () => {
   return {
     name: "treat-js-files-as-jsx",
@@ -24,30 +27,26 @@ const jsToJsx = () => {
 };
 
 export default defineConfig({
-  plugins: [
-    react(),
-    jsToJsx(),
-    tsconfigPaths(),
-    federation({
-      name: "remote_app",
-      filename: "remoteEntry.js",
-      // expose your module. This should be the main component of your project, 
-      // not the one having <React.StrictMode> but the one with your actual logic
-      // so exposing App.tsx not main.tsx
-      exposes: {
-         './PdfAccessibleHtml': './src/App' // left side name of module to expose can be your choice, right side is the path to the component
-      },
-      shared: ['react','react-dom']
-    })
-  ],
-  base: process.env.NODE_ENV == 'production' ? process.env.VITE_BASE_URL_PROD : process.env.VITE_BASE_URL,
   build: {
     rollupOptions: {
-      external:[],
+      external: [],
     },
     modulePreload: false,
     target: 'esnext',
     minify: false,
     cssCodeSplit: false
-  }
-})
+  },
+  plugins: [react(), jsToJsx(), tsconfigPaths(),federation({
+    name: "common",
+    filename: "remoteEntry.js",
+    exposes: {
+      './PdfAccessibleHtml': './src/pages/',
+    },
+    shared: ['react','react-dom']
+  })],
+  base: process.env.NODE_ENV == 'production' ? process.env.VITE_BASE_URL_PROD : process.env.VITE_BASE_URL,
+  server: {
+    host: "localhost",
+    port: 4173,
+  },
+});

@@ -1,10 +1,10 @@
 
-import DefaultLayout from "@/layouts/default";
+import DefaultLayout from "../layouts/default";
 import { useEffect, useState } from "react";
-import Main from "@/components/main";
-import { getFiles } from "@/actions";
+import Main from "../components/main";
+import { getFiles } from "../actions";
 import { toast } from "react-toastify";
-import { getEmail } from "@/constants";
+import { getEmail } from "../constants";
 
 export default function IndexPage() {
   const [files, setFiles] = useState([]);
@@ -13,6 +13,7 @@ export default function IndexPage() {
     try {
       setLoading(true);
       const userFiles = await getFiles(getEmail(), "");
+      //@ts-ignore
       setFiles(userFiles.sort((a: { last_modified_at: string }, b: { last_modified_at: string  }) => new Date(b.last_modified_at) - new Date(a.last_modified_at)));
     } catch (err) {
       console.log("err", err)
@@ -37,7 +38,7 @@ export default function IndexPage() {
           </span>
         </div>
       </section>
-      <div style={{ display: "flex", justifyContent: "start", alignItems: "start", width: "70%", margin: "auto", flexDirection: "column", gap: 5, marginBlock: 40 }}>
+      <div style={{ display: "flex", justifyContent: "start", alignItems: "start", width: "70%", margin: "auto", flexDirection: "column", gap: 5, marginBlock: 10 }}>
         <Main data={files} loadFiles={loadFiles} isLoading={isLoading} />
       </div>
     </DefaultLayout>

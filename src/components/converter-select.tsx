@@ -1,5 +1,5 @@
-import { converters } from '@/constants';
-import { Select, SelectItem } from '@heroui/react';
+import { Select, SelectItem } from "@nextui-org/react";
+import { converters } from "../constants";
 
 interface FormInputProps {
     onChange: any;
