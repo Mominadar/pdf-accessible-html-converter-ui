@@ -13,7 +13,7 @@ export default function IndexPage() {
     try {
       setLoading(true);
       const userFiles = await getFiles(getEmail(), "");
-      setFiles(userFiles);
+      setFiles(userFiles.sort((a: { last_modified_at: string }, b: { last_modified_at: string  }) => new Date(b.last_modified_at) - new Date(a.last_modified_at)));
     } catch (err) {
       console.log("err", err)
       toast.error("Could not load files!");

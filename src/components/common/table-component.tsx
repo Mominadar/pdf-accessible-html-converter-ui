@@ -20,7 +20,7 @@ import axios from "axios";
 
 export default function TableComponent({ data, isLoading, emptyContent }: { data: any, isLoading: boolean, emptyContent: string }) {
   const [page, setPage] = React.useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 6;
 
 
   const pages = React.useMemo(() => {
