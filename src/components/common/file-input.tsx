@@ -50,7 +50,7 @@ const DragAndDropUpload = ({onChange}: {onChange: any}) => {
         onChange={handleChange}
         accept="image/*"
       />
-      {files && files.length > 0 ? files.map((file)=> (<p>{file.name}</p>)): <p>Upload File</p>}
+      {files && files.length > 0 ? files.map((file)=> (<p key={file.name}>{file.name}</p>)): <p>Upload File</p>}
     </div>
   );
 };

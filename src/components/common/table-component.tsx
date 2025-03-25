@@ -143,7 +143,6 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
           </div>
         ) : null
       }
-      //style={{ height: "25rem" }}
       classNames={{
         wrapper: "min-h-[25rem] !shadow-[None] px-[0] no-colored-shadow",
       }}
@@ -163,7 +162,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
       >
         {items.map((item: RegistryEntry, index: number) => {
           return <TableRow key={item.id} style={{ borderRadius: "1rem", background: "white" }}>
-            {columnKeys.map((columnKey) => (<TableCell>{renderCell(item, columnKey, index)}</TableCell>))}
+            {columnKeys.map((columnKey) => (<TableCell key={`${item.id}${columnKey}`}>{renderCell(item, columnKey, index)}</TableCell>))}
           </TableRow>
         })}
       </TableBody>

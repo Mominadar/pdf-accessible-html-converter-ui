@@ -10,7 +10,7 @@ function randomString(length: number) {
     return result;
 }
 
-export function generateFileNameForUser(file: File) {
+export function generateFileNameForUser(fileName: string) {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -20,7 +20,7 @@ export function generateFileNameForUser(file: File) {
     const sec = String(date.getSeconds()).padStart(2, '0');
 
     const randomPrefix = randomString(6);
-    const name = file.name.replace(/ /g, '+');
+    const name = fileName.replace(/ /g, '+');
     const formattedDate = `${day}${month}${year}_${hour}${min}${sec}`;
     return `${randomPrefix}-${formattedDate}-${name}`;
 }

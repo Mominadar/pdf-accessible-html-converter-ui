@@ -64,6 +64,26 @@ export const uploadConfig = async (username: string, fileName:string, pdfUrl: st
     }
 }
 
+export const convert = async (objectKey: string) => {
+    try {
+        const res = await axios.post(`${BASE_URL}?action=convert`, {
+            object_key: objectKey
+        },
+            //   {
+            //     headers: {
+            //       "x-api-key": apiKey,
+            //       "Authorization": `Bearer ${token}`
+            //     }
+            //   }
+        );
+
+        console.log("resss", res);
+    } catch (err) {
+        console.log("err", err)
+    }
+}
+
+
 export const queueForConversion = async (username: string, fileName:string, pdfUrl: string, converter: string) => {
     try {
         const res = await uploadConfig(username, fileName, pdfUrl, converter);

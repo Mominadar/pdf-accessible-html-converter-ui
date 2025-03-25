@@ -7,13 +7,13 @@ import { Card, Divider, Input, semanticColors } from "@heroui/react";
 import { RxReset } from "react-icons/rx";
 import CountrySelect from "./converter-select";
 import TableComponent from "./common/table-component";
-import { getPdfUrl, queueForConversion, uploadFile } from "@/actions";
+import { convert, getPdfUrl, queueForConversion, uploadFile } from "@/actions";
 import { generateFileNameForUser } from "@/utils";
 import { toast } from "react-toastify";
 import { getEmail } from "@/constants";
 
 const Main = ({ data, loadFiles, isLoading }) => {
-    const [uploadedFile, setUploadedFile] = useState(null);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [pdfUrl, setPdfUrl] = useState("");
     const [converter, setConverter] = useState<Set<string>>(new Set());
     return (
@@ -69,13 +69,13 @@ const Main = ({ data, loadFiles, isLoading }) => {
                     let fileName = ""
                 
                     if (uploadedFile) {
-                        fileName = generateFileNameForUser(uploadedFile);
+                        fileName = generateFileNameForUser(uploadedFile.name);
                         const url = getPdfUrl(fileName);
                         await uploadFile(url, uploadedFile);
                         fileUrl = url;
                     }else if(pdfUrl){
                         fileUrl = pdfUrl;
-                        fileName = new URL(fileUrl).pathname.split('/').pop() ?? "";
+                        fileName = generateFileNameForUser(new URL(fileUrl).pathname.split('/').pop() ?? "sample-pdf.pdf" );
                     }else {
                         toast.error("Specify one of the options, either upload file or enter Url.");
                         return;
@@ -83,7 +83,9 @@ const Main = ({ data, loadFiles, isLoading }) => {
 
                     await queueForConversion(getEmail(), fileName,  fileUrl, converterValue);
                     toast.success("Queued file for conversion!");
-
+                    if(pdfUrl){
+                        convert(fileName);
+                    }
                     //load files after queuing
                     setTimeout(async ()=>{
                         await loadFiles();
