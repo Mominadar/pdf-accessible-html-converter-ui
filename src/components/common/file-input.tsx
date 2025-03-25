@@ -48,7 +48,7 @@ const DragAndDropUpload = ({onChange}: {onChange: any}) => {
         className="file-input"
         //@ts-ignore
         onChange={handleChange}
-        accept="image/*"
+        accept="pdf/*"
       />
       {files && files.length > 0 ? files.map((file)=> (<p key={file.name}>{file.name}</p>)): <p>Upload File</p>}
     </div>

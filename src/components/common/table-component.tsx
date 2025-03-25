@@ -36,7 +36,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
 
   const loadingState = isLoading ? "loading" : "idle";
 
-  const downloadTranslatedDocument = async (getUrl: string, name: string) => {
+  const downloadConvertedDocument = async (getUrl: string, name: string) => {
     try {
       const response = await axios.get(getUrl, {
         responseType: "blob",
@@ -60,7 +60,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
         .slice(0, -1)
         .join(".");
 
-      a.download = `translated_${originalFileNameWithoutExtension}.${extensionForDownload}`;
+      a.download = `converted_${originalFileNameWithoutExtension}.${extensionForDownload}`;
       a.href = url;
       a.click();
       window.URL.revokeObjectURL(url);
@@ -109,10 +109,10 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
         return (
           <div className="flex gap-[1rem]">
             <p className="text-bold text-sm capitalize text-default-400" onClick={() => {
-              downloadTranslatedDocument(user.put_url, user.object_key)
+              downloadConvertedDocument(user.put_url, user.object_key)
             }}> <RiDownload2Fill fontSize={"1.2rem"} /></p>
              <p className="text-bold text-sm capitalize text-default-400" onClick={() => {
-              downloadTranslatedDocument(user.put_url, user.object_key)
+              window.open(user.put_url, "_blank");
             }}> <FaExternalLinkAlt /></p>
           </div>
         );
