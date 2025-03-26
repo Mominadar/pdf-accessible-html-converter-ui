@@ -151,7 +151,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
       >
         {items.map((item: any, index: number) => {
           return <TableRow key={item.id} style={{ borderRadius: "1rem", background: "white" }}>
-            {columnKeys.map((columnKey) => (<TableCell key={`${item.id}${columnKey}`}>{renderCell(item, columnKey, index)}</TableCell>))}
+            {columnKeys.map((columnKey) => (<TableCell key={`${item.id}${columnKey}`}>{renderCell(item, columnKey, ((page-1) * rowsPerPage) + index)}</TableCell>))}
           </TableRow>
         })}
       </TableBody>

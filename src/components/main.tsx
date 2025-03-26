@@ -7,11 +7,10 @@ import CountrySelect from "./converter-select";
 import TableComponent from "./common/table-component";
 import { convert, getPdfUrl, queueForConversion, uploadFile } from "../actions";
 import { toast } from "react-toastify";
-import { getEmail } from "../constants";
 import { Button, Card, Divider, Input, semanticColors } from "@nextui-org/react";
 import { generateFileNameForUser } from "../utils";
 
-const Main = ({ data, loadFiles, isLoading }) => {
+const Main = ({ data, loadFiles, isLoading, user, accessToken }) => {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [pdfUrl, setPdfUrl] = useState("");
     const [converter, setConverter] = useState<Set<string>>(new Set());
@@ -84,10 +83,10 @@ const Main = ({ data, loadFiles, isLoading }) => {
                         return;
                     }
 
-                    await queueForConversion(getEmail(), fileName,  fileUrl, converterValue);
+                    await queueForConversion(user.email, fileName,  fileUrl, converterValue, accessToken);
                     toast.success("Queued file for conversion!");
                     if(pdfUrl){
-                        convert(fileName);
+                        convert(fileName, accessToken);
                     }
                     //load files after queuing
                     setTimeout(async ()=>{

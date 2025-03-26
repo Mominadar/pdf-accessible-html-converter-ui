@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import Main from "../components/main";
 import { getFiles } from "../actions";
 import { toast } from "react-toastify";
-import { getEmail } from "../constants";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function IndexPage() {
+export default function IndexPage({ user, accessToken }) {
   const [files, setFiles] = useState([]);
   const [isLoading, setLoading] = useState(true);
   const loadFiles = async () => {
     try {
       setLoading(true);
-      const userFiles = await getFiles(getEmail(), "");
+      const userFiles = await getFiles(user.email, accessToken);
       //@ts-ignore
       setFiles(userFiles.sort((a: { last_modified_at: string }, b: { last_modified_at: string  }) => new Date(b.last_modified_at) - new Date(a.last_modified_at)));
     } catch (err) {
@@ -39,7 +39,7 @@ export default function IndexPage() {
         </div>
       </section>
       <div style={{ display: "flex", justifyContent: "start", alignItems: "start", width: "70%", margin: "auto", flexDirection: "column", gap: 5, marginBlock: 10 }}>
-        <Main data={files} loadFiles={loadFiles} isLoading={isLoading} />
+        <Main data={files} loadFiles={loadFiles} isLoading={isLoading} user={user} accessToken={accessToken} />
       </div>
     </DefaultLayout>
   );

@@ -23,14 +23,14 @@ export const getPdfUrl = (fileName: string) => {
     return url
 }
 
-export const getFiles = async (user, token) => {
+export const getFiles = async (username: string, token: string) => {
     const apiKey = ""; //getApiKey(token);
     try {
         const res = await axios.post(`${BASE_URL}?action=get-files`, {
-            username: user
+            username: username
         }, {
             headers: {
-                "x-api-key": apiKey,
+                // "x-api-key": apiKey,
                 "Authorization": `Bearer ${token}`
             }
         });
@@ -42,7 +42,7 @@ export const getFiles = async (user, token) => {
     }
 };
 
-export const uploadConfig = async (username: string, fileName:string, pdfUrl: string, converter: string) => {
+export const uploadConfig = async (username: string, fileName:string, pdfUrl: string, converter: string, token: string) => {
     try {
         const res = await axios.post(`${BASE_URL}?action=upload-config`, {
             username: username,
@@ -50,12 +50,12 @@ export const uploadConfig = async (username: string, fileName:string, pdfUrl: st
             pdf_url: pdfUrl,
             converter: converter
         },
-            //   {
-            //     headers: {
-            //       "x-api-key": apiKey,
-            //       "Authorization": `Bearer ${token}`
-            //     }
-            //   }
+              {
+                headers: {
+                  //"x-api-key": apiKey,
+                  "Authorization": `Bearer ${token}`
+                }
+              }
         );
 
         console.log("resss", res);
@@ -64,30 +64,28 @@ export const uploadConfig = async (username: string, fileName:string, pdfUrl: st
     }
 }
 
-export const convert = async (objectKey: string) => {
+export const convert = async (objectKey: string, token: string) => {
     try {
-        const res = await axios.post(`${BASE_URL}?action=convert`, {
+        await axios.post(`${BASE_URL}?action=convert`, {
             object_key: objectKey
         },
-            //   {
-            //     headers: {
-            //       "x-api-key": apiKey,
-            //       "Authorization": `Bearer ${token}`
-            //     }
-            //   }
+              {
+                headers: {
+                //   "x-api-key": apiKey,
+                  "Authorization": `Bearer ${token}`
+                }
+              }
         );
 
-        console.log("resss", res);
     } catch (err) {
         console.log("err", err)
     }
 }
 
 
-export const queueForConversion = async (username: string, fileName:string, pdfUrl: string, converter: string) => {
+export const queueForConversion = async (username: string, fileName:string, pdfUrl: string, converter: string, token: string) => {
     try {
-        const res = await uploadConfig(username, fileName, pdfUrl, converter);
-        console.log("resss", res);
+        await uploadConfig(username, fileName, pdfUrl, converter, token);
     } catch (err) {
         console.log("err", err)
     }
