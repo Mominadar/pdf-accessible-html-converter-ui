@@ -14,26 +14,38 @@ class ApiService():
         self.object_store_client = object_store_client
 
     def convert_pdf_to_html(self, object_key):
-        config = self.db_client.find_by_id(object_key)
-        converter =  config["converter"]
-        get_url =  config["get_url"]
-        put_url =  config["put_url"]
-        if(not get_url or not put_url or not converter):
-            raise Exception('Something went wrong. Config incomplete!')
+        config = None
+        try:
+            config = self.db_client.find_by_id(object_key)
+        except Exception as e:
+            logger.error(e)
+            raise Exception("Could not find file config information")
         
-        if converter not in ["agentic", "mistral"]:
-            raise Exception("Invalid converter")
+        try:    
+            converter =  config["converter"]
+            get_url =  config["get_url"]
+            put_url =  config["put_url"]
+            if(not get_url or not put_url or not converter):
+                raise Exception('Something went wrong. Config incomplete!')
+            
+            if converter not in ["agentic", "mistral"]:
+                raise Exception("Invalid converter")
 
-        logger.info(f"Using converter: {converter}")
-        if converter == "agentic":
-            html = self.agentic_service.convert_pdf_to_html(get_url)
-            return self.upload_html_file(put_url, html)
-        elif converter == "mistral":
-            html = self.mistral_service.convert_pdf_to_html(get_url)
-        
-        put_url = self.upload_html_file(put_url, html)
-        self.db_client.put(object_key, "file_status", "done")
-        return put_url
+            logger.info(f"Using converter: {converter}")
+            if converter == "agentic":
+                html = self.agentic_service.convert_pdf_to_html(get_url)
+                return self.upload_html_file(put_url, html)
+            elif converter == "mistral":
+                html = self.mistral_service.convert_pdf_to_html(get_url)
+            
+            put_url = self.upload_html_file(put_url, html)
+            self.db_client.put(object_key, "file_status", "done")
+            return put_url
+        except Exception as e:
+            logger.error(e)
+            self.db_client.put(object_key, "file_status", "error")
+            self.db_client.put(object_key, "error_reason", str(e))
+
 
     def upload_html_file(self, put_url, html):
         html_file = io.StringIO(html)

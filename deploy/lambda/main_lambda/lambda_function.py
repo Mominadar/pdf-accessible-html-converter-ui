@@ -32,88 +32,26 @@ def lambda_handler(event, context):
            
         elif action == "convert":
             logger.info(f'Converting')
-            converter =   event_body["converter"] if "converter" else ""
-            if(not converter or converter not in ["agentic", "mistral"]):
-                return response_object(400, "Converter not provided. Specify converter as 'mistral' or 'agentic' for conversion")
-            
-            pdf_path = event_body["pdf_url"] if "pdf_url" else ""
-            if(not pdf_path):
-                return response_object(400, 'PDF url is not provided')
-    
-            html =  apiClient.convert_pdf_to_html(converter, pdf_path)
+            if "object_key" not in event_body:
+                return response_object(400, "Cannot find file")
+
+            object_key = event_body["object_key"]
+            html = apiClient.convert_pdf_to_html(object_key)
             return response_object(200, html)
                 
-        # elif action == "get-presigned-url":
-        #     logger.info(f'Get presigned urls') 
-
-        #     client_action = event_body["client_action"]
-        #     if(not client_action):
-        #         return response_object(500, 'Something went wrong!')
-                
-        #     file_name = event_body["name"]
-        #     if(not file_name):
-        #         return response_object(500, 'file name is not given!')
-                
-        #     url =  object_store_client.create_url(file_name, client_action)
-        #     return response_object(200, url)
-                
-        # elif action == "translate-file":
-        #     logger.info(f'translating file')
-
-        #     get_url = event_body["get_url"]
-        #     put_url = event_body["put_url"]
-        #     pdf_scale_down_ratio = event_body["scale"] if "scale" in event_body else None
-        #     original_file_name = event_body["original_file_name"]
-        #     if(not get_url or not put_url):
-        #         return response_object(500, 'file url is not given!')
-                
-        #     source_language =  event_body["source_language"] 
-        #     target_language = event_body["target_language"]
-        #     if(not source_language or not target_language):
-        #         return response_object(500, 'Source and target language are required!')
-            
-        #     model = event_body["model_id"]
-        #     region = event_body["region"]
-             
-        #     if(not model):
-        #         return response_object(500, 'Model not defined!')
-            
-        #     if region:
-        #         extra_params =  {'region': region }
-
-        #     apiClient.translate_file(get_url, put_url, original_file_name, source_language, target_language, model, scale=pdf_scale_down_ratio, extra_params=extra_params)
-        #     return response_object(200, 'file translated!')
-        
-        # elif action == "delete-file":
-        #     file_name = event_body["name"]
-        #     if(not file_name):
-        #         return response_object(500, 'file name is not given!')
-                
-        #     object_store_client.delete_file(file_name)
-        #     return response_object(200, 'file cleared!')
-        
         elif action == "upload-config":
-            scale = event_body["scale"] if "scale" in event_body else 0.5
-            source_language = event_body["source_language"]
-            get_url = event_body["get_url"]
-            username = event_body["username"]
-            target_language = event_body["target_language"]
-            model = event_body["model_id"] if "model_id" in event_body else None
-            region = event_body["region"] if "region" in event_body else None
-            original_file_name = event_body["original_file_name"]
+            username = event_body["username"] if "username" in event_body else None
+            file_name = event_body["file_name"] if "file_name" in event_body else None
+            get_url = event_body["pdf_url"] if "pdf_url" in event_body else None
+            converter = event_body["converter"] if "converter" in event_body else None
 
-            if(not get_url or not source_language or not target_language or not username or not original_file_name or not model):
-                return response_object(500, 'Required values not given!')
-                
-            if(not region):
-                extra_params = dict()
-            if region:
-                extra_params={'region': region}
-                
-            res = apiClient.upload_config(username, get_url, original_file_name, source_language, target_language, model, scale, extra_params)
+            if not username or not file_name or not get_url or not converter:
+                raise response_object(400, detail="Required information not providied")
+            
+            res = apiClient.upload_config(username, file_name, get_url, converter)
             return response_object(200, res)
-       
-        elif action == "get-user-files":
+            
+        elif action == "get-files":
             username = event_body["username"]
             if(not username):
                 return response_object(500, "username is required!")

@@ -50,11 +50,9 @@ async def covnert_pdf_to_html(request: Request):
             return datetime.now()
         
         elif action == "convert":
-            if "converter" not in body or body["converter"] not in ["agentic","mistral"]:
-                raise HTTPException(status_code=400, detail="Converter not provided. Specify converter as 'mistral' or 'agentic' for conversion")
             if "object_key" not in body:
                 raise HTTPException(status_code=400, detail="Cannot find file")
-            
+         
             object_key = body["object_key"]
             html = api_client.convert_pdf_to_html(object_key)
             return html

@@ -144,17 +144,17 @@ class AgenticPDFToMarkdownConverter:
             print("Failed to extract content from PDF. Exiting.")
             return False
         
-        # Save the raw response for debugging
-        debug_path = f"{output_path}.debug.json"
-        with open(debug_path, 'w', encoding='utf-8') as debug_file:
-            json.dump(response, debug_file, indent=2)
-        
-        print(f"Raw API response saved to: {debug_path}")
-        
         # Extract markdown content from the response
         markdown_content = self.extract_markdown_from_response(response)
         print(f"Conversion complete!")
         if output_path:
+            # Save the raw response for debugging
+            debug_path = f"{output_path}.debug.json"
+            with open(debug_path, 'w', encoding='utf-8') as debug_file:
+                json.dump(response, debug_file, indent=2)
+            
+            print(f"Raw API response saved to: {debug_path}")
+            
             # Save the markdown content
             with open(output_path, 'w', encoding='utf-8') as md_file:
                 md_file.write(markdown_content)
