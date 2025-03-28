@@ -107,7 +107,7 @@ const Main = ({ data, loadFiles, isLoading, user, accessToken }) => {
               <RxReset style={{fontSize:"1.2rem"}}/>
                 </Button> 
             </div>
-            <TableComponent isLoading={isLoading} data={data} emptyContent="No files found" />
+            <TableComponent isLoading={isLoading} data={data} emptyContent="No files found" accessToken={accessToken} />
         </Card>
     );
 };

@@ -4,10 +4,12 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { RiDownload2Fill } from "react-icons/ri";
 import axios from "axios";
-import { Chip, Table, Pagination, TableHeader, TableColumn, TableBody, Spinner, TableRow, TableCell } from "@nextui-org/react";
+import { Chip, Table, Pagination, TableHeader, TableColumn, TableBody, Spinner, TableRow, TableCell, Tooltip } from "@nextui-org/react";
 import { timeSince } from "../../utils";
+import { MdOutlineRefresh } from "react-icons/md";
+import { convert } from "../../actions";
 
-export default function TableComponent({ data, isLoading, emptyContent }: { data: any, isLoading: boolean, emptyContent: string }) {
+export default function TableComponent({ data, isLoading, emptyContent, accessToken }: { data: any, isLoading: boolean, emptyContent: string, accessToken: string }) {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 5;
 
@@ -89,6 +91,12 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
             <p className="text-bold text-sm capitalize text-default-400">{timeSince(cellValue)}</p>
           </div>
         );
+      case "last_modified_at":
+        return (
+          <div className="flex flex-col">
+            <p className="text-bold text-sm capitalize text-default-400">{timeSince(cellValue)}</p>
+          </div>
+        );
       case "file_status":
         return (<>
           {parseStatus(cellValue)}
@@ -96,13 +104,23 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
         );
       case "actions":
         return (
-          <div className="flex gap-[1rem]">
-            <p className="text-bold text-sm capitalize text-default-400" onClick={() => {
-              downloadConvertedDocument(user.put_url, user.object_key)
-            }}> <RiDownload2Fill fontSize={"1.2rem"} /></p>
-             <p className="text-bold text-sm capitalize text-default-400" onClick={() => {
-              window.open(user.put_url, "_blank");
-            }}> <FaExternalLinkAlt /></p>
+          <div className="flex gap-[1rem] items-center">
+            <Tooltip content="Download html file">
+              <p className="text-bold text-sm capitalize text-default-400" onClick={() => {
+                downloadConvertedDocument(user.put_url, user.object_key)
+              }}> <RiDownload2Fill fontSize={"1.2rem"} /></p>
+            </Tooltip>
+            <Tooltip content="View html file">
+              <p className="text-bold text-sm capitalize text-default-400" onClick={() => {
+                window.open(user.put_url, "_blank");
+              }}> <FaExternalLinkAlt /></p>
+            </Tooltip>
+            <Tooltip content="Reconvert file">
+              <p className="text-bold text-sm capitalize text-default-400" onClick={async () => {
+                toast.success("Reconverting file");
+                convert(user["object_key"], accessToken);
+              }}> <MdOutlineRefresh fontSize={"1.2rem"} style={{ fontWeight: 900 }} /></p>
+            </Tooltip>
           </div>
         );
       default:
@@ -110,7 +128,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
     }
   }, [items, data]);
 
-  const columnKeys = ["index", "object_key", "file_status", "created_at", "actions"];
+  const columnKeys = ["index", "object_key", "file_status", "created_at", "last_modified_at", "actions"];
 
 
 
@@ -141,6 +159,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
         <TableColumn key="object_key">Document Name</TableColumn>
         <TableColumn key="file_status">Status</TableColumn>
         <TableColumn key="created_at">Created At</TableColumn>
+        <TableColumn key="last_modified_at">Last Modified At</TableColumn>
         <TableColumn key="actions">actions</TableColumn>
       </TableHeader>
       <TableBody
@@ -151,7 +170,7 @@ export default function TableComponent({ data, isLoading, emptyContent }: { data
       >
         {items.map((item: any, index: number) => {
           return <TableRow key={item.id} style={{ borderRadius: "1rem", background: "white" }}>
-            {columnKeys.map((columnKey) => (<TableCell key={`${item.id}${columnKey}`}>{renderCell(item, columnKey, ((page-1) * rowsPerPage) + index)}</TableCell>))}
+            {columnKeys.map((columnKey) => (<TableCell key={`${item.id}${columnKey}`}>{renderCell(item, columnKey, ((page - 1) * rowsPerPage) + index)}</TableCell>))}
           </TableRow>
         })}
       </TableBody>
