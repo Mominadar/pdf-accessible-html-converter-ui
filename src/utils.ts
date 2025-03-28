@@ -26,13 +26,10 @@ export function generateFileNameForUser(fileName: string) {
 }
 
 export function timeSince(date: string) {
-    const now_date = new Date();
-    var now_utc = new Date(Date.UTC(now_date.getUTCFullYear(), now_date.getUTCMonth(),
-        now_date.getUTCDate(), now_date.getUTCHours(),
-        now_date.getUTCMinutes(), now_date.getUTCSeconds()));
-
-    const current_date_utc = new Date(date).getTime();
-    const seconds = Math.floor((now_utc.getTime() - current_date_utc) / 1000);
+    
+    const utcDate = new Date(date + "Z"); // Adding "Z" ensures it's treated as UTC
+    const current_date_utc = utcDate.getTime();
+    const seconds = Math.floor((Date.now() - current_date_utc) / 1000);
     let interval = seconds / 31536000;
     if (isNaN(interval)) {
         return "---";

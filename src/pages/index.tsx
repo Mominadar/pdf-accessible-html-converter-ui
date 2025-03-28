@@ -6,7 +6,7 @@ import { getFiles } from "../actions";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function IndexPage({ user, accessToken }) {
+export default function IndexPage({ user, accessToken }: {user: any, accessToken: string}) {
   const [files, setFiles] = useState([]);
   const [isLoading, setLoading] = useState(true);
   const loadFiles = async () => {
