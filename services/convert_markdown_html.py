@@ -3,44 +3,12 @@
 import os
 import re
 import html
-import subprocess
-import requests
-import shutil
-import tarfile
-import markdown
-# # Define paths
-# PANDOC_DIR = "/tmp/pandoc"
-# PANDOC_BIN = f"{PANDOC_DIR}/bin/pandoc"
-# PANDOC_TAR = "/tmp/pandoc.tar.gz"
-# PANDOC_TAR_URL = "https://github.com/jgm/pandoc/releases/download/3.1.8/pandoc-3.1.8-linux-amd64.tar.gz"
 
-# # Ensure Pandoc is installed
-# if not os.path.exists(PANDOC_BIN):
-#     os.makedirs(PANDOC_DIR, exist_ok=True)
-    
-#     # Download Pandoc using requests
-#     print("Downloading Pandoc...")
-#     response = requests.get(PANDOC_TAR_URL, stream=True)
-#     with open(PANDOC_TAR, "wb") as f:
-#         shutil.copyfileobj(response.raw, f)
-#     print("Download complete!")
 
-#     # Extract Pandoc using Python's tarfile (no tar command needed)
-#     print("Extracting Pandoc...")
-#     with tarfile.open(PANDOC_TAR, "r:gz") as tar:
-#         tar.extractall(path=PANDOC_DIR)
-#     print("Extraction complete!")
+import pypandoc
 
-# # Set Pandoc in PATH
-# os.environ["PATH"] += os.pathsep + f"{PANDOC_DIR}/bin"
 
-# import pypandoc
-
-# try:
-#     result = subprocess.run(["pandoc", "--version"], capture_output=True, text=True, check=True)
-#     print("Pandoc found at:", result.stdout.strip())
-# except subprocess.CalledProcessError:
-#     print("Pandoc not found in PATH")
+os.environ.setdefault('PYPANDOC_PANDOC', os.path.join(os.getcwd(), "pandoc", "pandoc"))
 
 from bs4 import BeautifulSoup
 
@@ -107,46 +75,16 @@ class MarkdownToHTMLConverter:
         Convert markdown content to HTML with MathJax support.
         Uses pandoc directly for better math rendering.
         """
-        # Write markdown content to a temporary file
-        # temp_md = "temp_content.md"
-        # with open(temp_md, "w", encoding="utf-8") as f:
-        #     f.write(markdown_content)
         
-        # Use pandoc to convert markdown to HTML with MathJax support
-        # html_content = pypandoc.convert_file(
-        #     source_file=temp_md,
-        #     to="html",
-        #     format="markdown",
-        #     extra_args=[
-        #         "--standalone",
-        #         "--mathjax",
-        #         f"--metadata=title:{title}"
-        #     ]
-        # )
+        html_content = pypandoc.convert_text(markdown_content, 'html', format='md', extra_args=[
+                "--standalone",
+                "--mathjax",
+                f"--metadata=title:{title}"
+            ])
+        
+        
 
-        # html_content = pypandoc.convert_text(markdown_content, 'html', format='md', extra_args=[
-        #         "--standalone",
-        #         "--mathjax",
-        #         f"--metadata=title:{title}"
-        #     ])
-        
-        # md = markdown.Markdown(
-        #     extensions=['mdx_math'],
-        #     extension_configs={
-        #         'mdx-math': {'enable_dollar_delimiter': True}
-        #     }
-        # )
-        # html_content = markdown_content.format(md.convert(src))
-        html_content = markdown.markdown(markdown_content, 
-          #extensions=['mdx_math'],
-            # extension_configs={
-            #     'mdx-math': {'enable_dollar_delimiter': True}
-            # }
-            )
-
-        # Clean up temporary file
-        #os.remove(temp_md)
-        
+       
         return html_content
 
     def fix_mathjax_in_html(self, html_content):

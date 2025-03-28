@@ -7,10 +7,6 @@ class ObjectStoreClient:
     def __init__(self, client) -> None:
         self.client = client
           
-    def create_url(self, file_name, client_action):
-        url = self.create_url(file_name, client_action)
-        return url
-    
     def upload_file(self, url, file):
         try:
             self.client.upload_file(url, file)
@@ -20,29 +16,12 @@ class ObjectStoreClient:
                 f"name of a file that exists on your computer."
             )
             raise
-
-    def get_file(self, url):
-        try:
-            return self.client.get_file(url)
-        except:
-            logger.error(f'Could not get file. {url}')
-            raise
     
     def delete_file(self, file_name):
         try:
             return self.client.delete_file(file_name)
         except Exception as e:
             logger.error(f'Could not remove file. {file_name}, {str(e)}')
-            return {
-                    'statusCode': 400,
-                    'body': json.dumps(str(e))
-                }
-        
-    def get_url_from_key(self, key):
-        try:
-            return self.client.get_url_from_key(key)
-        except Exception as e:
-            logger.error(f'Could not get urls for key: {key}, {str(e)}')
             return {
                     'statusCode': 400,
                     'body': json.dumps(str(e))

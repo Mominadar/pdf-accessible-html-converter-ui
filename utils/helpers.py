@@ -2,7 +2,7 @@
 import json
 import re
 from urllib.parse import unquote
-from datetime import datetime
+from datetime import datetime, timezone
 
 def response_object(status_code:int, body, headers={
                     "Access-Control-Allow-Origin": "*", 
@@ -21,7 +21,7 @@ def decode_url(url):
 
 def get_current_date_str():
     # Get the current date and time
-    current_datetime = datetime.now()
+    current_datetime = datetime.now(timezone.utc)
     # Convert to string
     datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S")  # DateTime as string: "YYYY-MM-DD HH:MM:SS"
     return datetime_str

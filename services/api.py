@@ -34,7 +34,6 @@ class ApiService():
             logger.info(f"Using converter: {converter}")
             if converter == "agentic":
                 html = self.agentic_service.convert_pdf_to_html(get_url)
-                return self.upload_html_file(put_url, html)
             elif converter == "mistral":
                 html = self.mistral_service.convert_pdf_to_html(get_url)
             
@@ -48,8 +47,9 @@ class ApiService():
 
 
     def upload_html_file(self, put_url, html):
-        html_file = io.StringIO(html)
-        self.object_store_client.upload_file(put_url, html_file)
+        buffer = io.BytesIO(html.encode("utf-8"))  # Encode as UTF-8
+        filename = put_url[put_url.rfind("/")+1:]
+        self.object_store_client.upload_file(filename, buffer)
         return put_url
        
     def upload_config(self, username, original_file_name, get_url, converter):
@@ -59,14 +59,15 @@ class ApiService():
             
             put_url = self.object_store_client.get_put_url(get_url)
             # store config in db to be picked up when file is processed
+            current_utc_time = get_current_date_str()
             self.db_client.create({
                 'object_key': {"S" :original_file_name},
                 'username': {"S" : username},
                 'converter' : {"S" : converter},
                 'get_url' : {"S" : get_url},
                 'put_url' : {"S" : put_url},
-                'last_modified_at' : {"S" : get_current_date_str()},
-                'created_at' : {"S" : get_current_date_str()},
+                'last_modified_at' : {"S" : current_utc_time},
+                'created_at' : {"S" : current_utc_time},
                 'file_status': {"S" :"in_progress"},
             })
 

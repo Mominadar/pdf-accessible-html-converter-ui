@@ -1,12 +1,19 @@
+import io
 import os
+import sys
 import zipfile
 import boto3
 from botocore.exceptions import NoCredentialsError
 from dotenv import load_dotenv
 
+sys.path.append(".")
+
+from services.object_store.S3Client import S3Client
+
+
 load_dotenv()
 
-folders_to_zip = ['./services', './utils','.'] # '.' mean current directory
+folders_to_zip = ['./services', './utils', './pandoc', '.'] # '.' mean current directory
 
 # lambda config 
 LAMBDA_FUNCTION_NAME = "pdf-accessible-html-convertor"
@@ -31,7 +38,7 @@ def zip_folder(folder_path, zipf, is_recursive=True):
         # Recursively add all .py files from folder and subfolders
         for root, _, files in os.walk(folder_path):
             for file in files:
-                if file.endswith('.py'):
+                if file == 'pandoc-3.6.4-1-amd64.deb' or file=="pandoc" or file.endswith('.py'):
                     file_path = os.path.join(root, file)
                     arcname = os.path.relpath(file_path, os.getcwd())
                     zipf.write(file_path, arcname)
@@ -39,10 +46,10 @@ def zip_folder(folder_path, zipf, is_recursive=True):
         # Add only .py files from the given folder (non-recursive)
         for file in os.listdir(folder_path):
             file_path = os.path.join(folder_path, file)
-            if file.endswith('.py') and os.path.isfile(file_path):
+            if (file == 'pandoc-3.6.4-1-amd64.deb' or file=="pandoc" or file.endswith('.py')) and os.path.isfile(file_path):
                 zipf.write(file_path, os.path.basename(file_path))
 
-def zip_current_folder(zip_name):
+def zip_current_folder(zip_name, lambda_dir):
     """
     Zips specific folders and files into a zip archive.
 
@@ -57,16 +64,14 @@ def zip_current_folder(zip_name):
         zip_folder(current_dir, zipf, is_recursive=False)
 
         # Step 2: Add subdirectories recursively (e.g., 'lambda-layer/')
-        dirs_to_copy = ['./services','./utils']
+        dirs_to_copy = ['./services','./utils', './pandoc']
         for directory in dirs_to_copy:
             subfolder = os.path.join(current_dir, directory)
             if os.path.exists(subfolder):
                 zip_folder(subfolder, zipf, is_recursive=True)
 
         # Step 3: Add 't.py' from '/deploy/lambda/' to the root of the zip
-        lambda_dir = lambda_map[LAMBDA_FUNCTION_NAME]
         lambda_entrypoint = 'lambda_function.py'
-
         lambda_file = os.path.join(current_dir, 'deploy', 'lambda', lambda_dir, lambda_entrypoint)
         if os.path.isfile(lambda_file):
             zipf.write(lambda_file, lambda_entrypoint)
@@ -95,19 +100,26 @@ def upload_zip_to_lambda(zip_name, function_name):
         print(f"An error occurred: {str(e)}")
         return None
 
-def upload():
+def upload(name=LAMBDA_FUNCTION_NAME):
     # Specify the zip file name
-    zip_name = 'lambda_function_code.zip'
+    lambda_dir = lambda_map[name]
+    zip_name = f'lambda_function_code_{lambda_dir}.zip'
     
     # Call the function to zip the folder
-    zip_current_folder(zip_name)
+    zip_current_folder(zip_name, lambda_dir)
         
     # Upload the zip file to AWS Lambda
-    upload_zip_to_lambda(zip_name, LAMBDA_FUNCTION_NAME)
+    #upload_zip_to_lambda(zip_name, LAMBDA_FUNCTION_NAME)
+    s3 = S3Client()
+    file = os.path.join(os.getcwd(),zip_name)
+    with open(file, "rb") as rb_file:
+        file_bytes = io.BytesIO(rb_file.read())
 
+    s3.upload_file(zip_name, file_bytes, bucket="pdf-accessible-html-converter")
     # remove zip file
     os.remove(zip_name)
 
 # To run locally
 if __name__ == "__main__":
-    upload()
+    upload("pdf-accessible-html-convertor")
+    upload("pdf-accessible-html-convertor-async")
