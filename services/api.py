@@ -21,7 +21,8 @@ class ApiService():
             logger.error(e)
             raise Exception("Could not find file config information")
         
-        try:    
+        try: 
+            self.db_client.put(object_key, "file_status", "in_progress") 
             converter =  config["converter"]
             get_url =  config["get_url"]
             put_url =  config["put_url"]
