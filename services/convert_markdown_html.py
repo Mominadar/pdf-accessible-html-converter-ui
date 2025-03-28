@@ -82,9 +82,6 @@ class MarkdownToHTMLConverter:
                 f"--metadata=title:{title}"
             ])
         
-        
-
-       
         return html_content
 
     def fix_mathjax_in_html(self, html_content):

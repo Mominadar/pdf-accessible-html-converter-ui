@@ -1,5 +1,7 @@
 import json
 from services.db.dynamo import DynamoDBClient
+
+from services.lambda_service import LambdaService
 from services.object_store.S3Client import S3Client
 from utils.helpers import response_object
 from utils.logger import Logger
@@ -9,7 +11,7 @@ logger = Logger(name="PAHTML Logger")
 logger = Logger.get_logger()
 
 from services.api import ApiService
-            
+
 def lambda_handler(event, context):
     try:
         action = event["queryStringParameters"]["action"]
@@ -36,8 +38,11 @@ def lambda_handler(event, context):
                 return response_object(400, "Cannot find file")
 
             object_key = event_body["object_key"]
-            html = apiClient.convert_pdf_to_html(object_key)
-            return response_object(200, html)
+            lambda_client =  LambdaService()
+            response = lambda_client.invoke(object_key)
+            if(response):
+                return response_object(200, "Converting file")
+            return response_object(400, "Cannot covnert file. Try agin")
                 
         elif action == "upload-config":
             username = event_body["username"] if "username" in event_body else None

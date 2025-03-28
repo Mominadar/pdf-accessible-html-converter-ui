@@ -1,10 +1,10 @@
-import os
 import sys
 import nest_asyncio
 import uvicorn
 
 sys.path.append(".")
 
+from services.lambda_service import LambdaService
 from services.object_store.S3Client import S3Client
 from utils.logger import Logger
 
@@ -29,8 +29,6 @@ app.add_middleware(
 
 d = S3Client()
 api_client = ApiService(DynamoDBClient(), S3Client())
-print("dfddd", api_client)
-
 
 @app.get("/")
 def health_check():
@@ -54,8 +52,12 @@ async def covnert_pdf_to_html(request: Request):
                 raise HTTPException(status_code=400, detail="Cannot find file")
          
             object_key = body["object_key"]
-            html = api_client.convert_pdf_to_html(object_key)
-            return html
+            lambda_client =  LambdaService()
+            response = lambda_client.invoke(object_key)
+            if(response):
+                return "converting file"
+            
+            raise HTTPException(status_code=400, detail="Cannot convert file. Something went wrong")
         
         elif action == "upload-config":
             username = body["username"] if "username" in body else None

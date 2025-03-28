@@ -18,12 +18,14 @@ folders_to_zip = ['./services', './utils', './pandoc', '.'] # '.' mean current d
 # lambda config 
 LAMBDA_FUNCTION_NAME = "pdf-accessible-html-convertor"
 LAMBDA_REGION_NAME = "eu-north-1"
-
+BUCKET_NAME="pdf-accessible-html-converter"
 
 lambda_map = {
     'pdf-accessible-html-convertor': 'main_lambda',
     'pdf-accessible-html-convertor-async': 'file_lambda'
 }
+
+client = boto3.client('lambda', region_name=LAMBDA_REGION_NAME)
 
 def zip_folder(folder_path, zipf, is_recursive=True):
     """
@@ -79,7 +81,6 @@ def zip_current_folder(zip_name, lambda_dir):
     print(f"Files zipped successfully into '{zip_name}'.")
 
 def upload_zip_to_lambda(zip_name, function_name):
-    client = boto3.client('lambda', region_name=LAMBDA_REGION_NAME)
 
     try:
         with open(zip_name, 'rb') as zip_file:
@@ -100,6 +101,24 @@ def upload_zip_to_lambda(zip_name, function_name):
         print(f"An error occurred: {str(e)}")
         return None
 
+def deploy_lambda(lambda_function_name, zip_name):
+    """Create or update the Lambda function from S3."""
+    try:
+        # Check if the function exists
+        client.get_function(FunctionName=lambda_function_name)
+        print("ℹ️ Lambda function exists. Updating...")
+
+        # Update the function code
+        response = client.update_function_code(
+            FunctionName=lambda_function_name,
+            S3Bucket=BUCKET_NAME,
+            S3Key=zip_name,
+        )
+        print("✅ Lambda function updated:", response["FunctionArn"])
+
+    except Exception as e:
+        print("ℹ️ Error", e)
+
 def upload(name=LAMBDA_FUNCTION_NAME):
     # Specify the zip file name
     lambda_dir = lambda_map[name]
@@ -115,7 +134,8 @@ def upload(name=LAMBDA_FUNCTION_NAME):
     with open(file, "rb") as rb_file:
         file_bytes = io.BytesIO(rb_file.read())
 
-    s3.upload_file(zip_name, file_bytes, bucket="pdf-accessible-html-converter")
+    s3.upload_file(zip_name, file_bytes, bucket=BUCKET_NAME)
+    deploy_lambda(name, zip_name)
     # remove zip file
     os.remove(zip_name)
 
