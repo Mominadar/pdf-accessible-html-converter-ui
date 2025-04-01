@@ -65,9 +65,16 @@ export default function TableComponent({ data, isLoading, emptyContent, accessTo
 
   const parseStatus = (status: string) => {
     return <Chip className="capitalize" size="sm" variant="flat" color={status == "done" ? "success" : status == "error" ? "danger" : "primary"} style={{ textTransform: "capitalize" }}>
-      <span>{status == "in_progress" ? "In Progress" : status == "error" ? "Could not process. Try uploading again" : "Completed"}</span>
+      <span>{status == "in_progress" ? "In Progress" : status == "error" ? "Error. Try again" : "Completed"}</span>
     </Chip>
   }
+
+  const parseConverter = (converter: string) => {
+    return <Chip className="capitalize" size="sm" variant="flat" color={converter == "agentic" ? "secondary" : "primary"} style={{ textTransform: "capitalize" }}>
+      <span>{converter == "agentic" ? "Agentic" : "Mistral"}</span>
+    </Chip>
+  }
+
 
   const renderCell = React.useCallback((user: any, columnKey: string, index: number) => {
     //@ts-ignore
@@ -82,9 +89,16 @@ export default function TableComponent({ data, isLoading, emptyContent, accessTo
       case "object_key":
         return (
           <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize text-default-400">{cellValue}</p>
+            <p className="text-bold text-sm capitalize text-default-400 underline" onClick={() => {
+               window.open(user.get_url, "_blank");
+              }}>{cellValue}</p>
           </div>
         );
+      case "converter":
+          return (<>
+            {parseConverter(cellValue)}
+          </>
+          );
       case "created_at":
         return (
           <div className="flex flex-col">
@@ -128,9 +142,7 @@ export default function TableComponent({ data, isLoading, emptyContent, accessTo
     }
   }, [items, data]);
 
-  const columnKeys = ["index", "object_key", "file_status", "created_at", "last_modified_at", "actions"];
-
-
+  const columnKeys = ["index", "object_key", "converter", "file_status", "created_at", "last_modified_at", "actions"];
 
   return (
     <Table
@@ -157,6 +169,7 @@ export default function TableComponent({ data, isLoading, emptyContent, accessTo
       <TableHeader>
         <TableColumn key="index">Sr No.</TableColumn>
         <TableColumn key="object_key">Document Name</TableColumn>
+        <TableColumn key="object_key">Converter</TableColumn>
         <TableColumn key="file_status">Status</TableColumn>
         <TableColumn key="created_at">Created At</TableColumn>
         <TableColumn key="last_modified_at">Last Modified At</TableColumn>
