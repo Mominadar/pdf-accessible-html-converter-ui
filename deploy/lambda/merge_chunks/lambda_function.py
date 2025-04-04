@@ -1,3 +1,4 @@
+import io
 import json
 import ast
 import os
@@ -25,13 +26,14 @@ def merge_chunks(chunks):
     for chunk in chunks:
         item = ast.literal_eval(chunk["body"])
         key = item["object_key"]
-        response = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
-        merged_content += response["Body"].read().decode("utf-8") + "\n"
+        response = s3_client.get_file(key, BUCKET_NAME)
+        merged_content += response.decode("utf-8") + "\n"
 
     merged_content += "</body></html>"
 
+    bytes = io.BytesIO(merged_content.encode("utf-8"))
     merged_key = file_id.replace(".pdf", ".html")
-    s3_client.upload_file(bucket=BUCKET_NAME, filename=merged_key, file=merged_content, ContentType="text/html")
+    s3_client.upload_file(bucket=BUCKET_NAME, filename=merged_key, file=bytes, ContentType="text/html")
 
     try:
         api_service = ApiService(db_client, s3_client)
