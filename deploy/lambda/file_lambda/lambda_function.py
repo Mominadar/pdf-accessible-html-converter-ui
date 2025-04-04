@@ -22,8 +22,8 @@ def lambda_handler(event, context):
         
         object_key = urllib.parse.unquote(object_key)
         logger.info(f"key: {object_key}")
-        apiClient.convert_pdf_to_html(object_key, original_key, get_url)
-        return response_object(200, {"object_key": object_key, "original_key": original_key})
+        html_filekey = apiClient.convert_pdf_to_html(object_key, original_key, get_url)
+        return response_object(200, {"object_key": html_filekey, "original_key": original_key})
             
     except Exception as e:
         logger.error(e)

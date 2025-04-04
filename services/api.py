@@ -1,4 +1,5 @@
 import io
+from urllib.parse import urlparse
 from services.agentic.agentic_service import AgenticService
 from services.mistral.mistral_service import MistralService
 from utils.helpers import get_current_date_str
@@ -46,9 +47,9 @@ class ApiService():
                 mistral_service = MistralService()
                 html = mistral_service.convert_pdf_to_html(get_url)
             
-            put_url = self.upload_html_file(put_url, html)
+            filename = self.upload_html_file(put_url, html)
             # self.db_client.put(object_key, "file_status", "done")
-            return put_url
+            return filename
         except Exception as e:
             logger.error(e)
             self.db_client.put(object_key, "file_status", "error")
@@ -56,9 +57,10 @@ class ApiService():
 
     def upload_html_file(self, put_url, html):
         buffer = io.BytesIO(html.encode("utf-8"))  # Encode as UTF-8
-        filename = put_url[put_url.rfind("/")+1:]
+        parsed_url = urlparse(put_url)
+        filename = parsed_url.path.lstrip("/")  # remove leading slash
         self.object_store_client.upload_file(filename, buffer)
-        return put_url
+        return filename
        
     def upload_config(self, username, original_file_name, get_url, converter):
         try:
