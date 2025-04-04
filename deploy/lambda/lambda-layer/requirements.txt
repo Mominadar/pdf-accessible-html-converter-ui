@@ -7,3 +7,4 @@ pypandoc
 bs4
 pydantic
 markdown
+PyMUPDF==1.25.4

@@ -16,12 +16,27 @@ class S3Client:
     def __init__(self) -> None:
         self.client = boto3.client(service_name='s3', region_name=BUCKET_REGION)
         
-    def upload_file(self, filename, file, bucket=TARGET_BUCKET_NAME):
+    def upload_file(self, filename, file, bucket=TARGET_BUCKET_NAME, ContentType="text/html; charset=utf-8"):
         try:
-            self.client.upload_fileobj(file, bucket, filename, ExtraArgs={"ContentType": "text/html; charset=utf-8"})
+            self.client.upload_fileobj(file, bucket, filename, ExtraArgs={"ContentType": ContentType})
         except FileNotFoundError:
             logger.error(
                 f"Couldn't find {filename} For a PUT operation, the key must be the "
+                f"name of a file that exists on your computer."
+            )
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise
+    
+    def get_file(self, key, bucket):
+        try:
+            response = self.client.get_object(Bucket=bucket, Key=key)
+            data = response["Body"].read()
+            return data
+        except FileNotFoundError:
+            logger.error(
+                f"Couldn't find {key} For a PUT operation, the key must be the "
                 f"name of a file that exists on your computer."
             )
             raise

@@ -4,15 +4,22 @@ from services.mistral.mistral_service import MistralService
 from utils.helpers import get_current_date_str
 from utils.logger import Logger
 
+logger = Logger(name="NLLB Logger")
 logger = Logger.get_logger()
 
 class ApiService():
-    def __init__(self, db_client, object_store_client):
-        self.agentic_service = AgenticService()
-        self.mistral_service = MistralService()
+    def __init__(self, db_client, object_store_client):        
         self.db_client = db_client
         self.object_store_client = object_store_client
 
+    def mark_file_status(self, object_key, status):
+        try:
+            self.db_client.find_by_id(object_key)
+            self.db_client.put(object_key, "file_status", status) 
+        except Exception as e:
+            logger.error(e)
+            raise Exception("Could not find file config information")
+        
     def convert_pdf_to_html(self, object_key):
         config = None
         try:
@@ -22,7 +29,7 @@ class ApiService():
             raise Exception("Could not find file config information")
         
         try: 
-            self.db_client.put(object_key, "file_status", "in_progress") 
+            # self.db_client.put(object_key, "file_status", "in_progress") 
             converter =  config["converter"]
             get_url =  config["get_url"]
             put_url =  config["put_url"]
@@ -34,18 +41,19 @@ class ApiService():
 
             logger.info(f"Using converter: {converter}")
             if converter == "agentic":
-                html = self.agentic_service.convert_pdf_to_html(get_url)
+                agentic_service = AgenticService()
+                html = agentic_service.convert_pdf_to_html(get_url)
             elif converter == "mistral":
-                html = self.mistral_service.convert_pdf_to_html(get_url)
+                mistral_service = MistralService()
+                html = mistral_service.convert_pdf_to_html(get_url)
             
             put_url = self.upload_html_file(put_url, html)
-            self.db_client.put(object_key, "file_status", "done")
+            # self.db_client.put(object_key, "file_status", "done")
             return put_url
         except Exception as e:
             logger.error(e)
             self.db_client.put(object_key, "file_status", "error")
             self.db_client.put(object_key, "error_reason", str(e))
-
 
     def upload_html_file(self, put_url, html):
         buffer = io.BytesIO(html.encode("utf-8"))  # Encode as UTF-8

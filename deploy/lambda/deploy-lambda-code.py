@@ -16,13 +16,14 @@ load_dotenv()
 folders_to_zip = ['./services', './utils', './pandoc', '.'] # '.' mean current directory
 
 # lambda config 
-LAMBDA_FUNCTION_NAME = "pdf-accessible-html-convertor"
 LAMBDA_REGION_NAME = "eu-north-1"
 BUCKET_NAME="pdf-accessible-html-converter"
 
 lambda_map = {
     'pdf-accessible-html-convertor': 'main_lambda',
-    'pdf-accessible-html-convertor-async': 'file_lambda'
+    'pdf-accessible-html-convertor-async': 'file_lambda',
+    'pdf-to-accessible-html-step-1-divide-into-chunks': 'split_file_into_chunks',
+    "pdf-accessible-html-step-3-merge-chunks": "merge_chunks"
 }
 
 client = boto3.client('lambda', region_name=LAMBDA_REGION_NAME)
@@ -119,7 +120,7 @@ def deploy_lambda(lambda_function_name, zip_name):
     except Exception as e:
         print("ℹ️ Error", e)
 
-def upload(name=LAMBDA_FUNCTION_NAME):
+def upload(name):
     # Specify the zip file name
     lambda_dir = lambda_map[name]
     zip_name = f'lambda_function_code_{lambda_dir}.zip'
@@ -143,3 +144,5 @@ def upload(name=LAMBDA_FUNCTION_NAME):
 if __name__ == "__main__":
     upload("pdf-accessible-html-convertor")
     upload("pdf-accessible-html-convertor-async")
+    upload("pdf-to-accessible-html-step-1-divide-into-chunks")
+    upload("pdf-accessible-html-step-3-merge-chunks")
