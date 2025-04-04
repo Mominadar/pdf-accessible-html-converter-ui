@@ -13,19 +13,17 @@ from services.api import ApiService
 
 def lambda_handler(event, context):
     try:
-        event_name = event["Records"][0]["eventName"]
-        if(not event_name or "ObjectCreated" not in event_name):
-            return response_object(500, 'Action is not defined or valid!')
-            
-        logger.info(f'Event:  {event_name}')
-        
+        logger.info(f"event: {event}")
         apiClient = ApiService(db_client=DynamoDBClient(), object_store_client=S3Client())
     
-        object_key = event["Records"][0]["s3"]["object"]["key"]   
+        object_key = event["Payload"]["chunk_key"]
+        original_key = event["Payload"]["original_key"] 
+        get_url = event["Payload"]["get_url"]   
+        
         object_key = urllib.parse.unquote(object_key)
         logger.info(f"key: {object_key}")
-        apiClient.convert_pdf_to_html(object_key)
-        return response_object(200, object_key)
+        apiClient.convert_pdf_to_html(object_key, original_key, get_url)
+        return response_object(200, {"object_key": object_key, "original_key": original_key})
             
     except Exception as e:
         logger.error(e)

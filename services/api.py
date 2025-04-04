@@ -20,10 +20,10 @@ class ApiService():
             logger.error(e)
             raise Exception("Could not find file config information")
         
-    def convert_pdf_to_html(self, object_key):
+    def convert_pdf_to_html(self, object_key, original_key, get_url):
         config = None
         try:
-            config = self.db_client.find_by_id(object_key)
+            config = self.db_client.find_by_id(original_key)
         except Exception as e:
             logger.error(e)
             raise Exception("Could not find file config information")
@@ -31,8 +31,7 @@ class ApiService():
         try: 
             # self.db_client.put(object_key, "file_status", "in_progress") 
             converter =  config["converter"]
-            get_url =  config["get_url"]
-            put_url =  config["put_url"]
+            put_url =  get_url.replace(".pdf", ".html")
             if(not get_url or not put_url or not converter):
                 raise Exception('Something went wrong. Config incomplete!')
             

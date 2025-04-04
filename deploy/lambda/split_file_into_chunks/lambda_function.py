@@ -16,6 +16,7 @@ stepfunctions = boto3.client("stepfunctions", region_name=os.environ.get("STATE_
 
 SOURCE_BUCKET_NAME = os.environ["SOURCE_BUCKET_NAME"]
 TARGET_BUCKET_NAME = os.environ["TARGET_BUCKET_NAME"]
+BUCKET_REGION = os.environ["BUCKET_REGION"]
 
 logger = Logger(name="NLLB Logger")
 logger = Logger.get_logger()
@@ -45,8 +46,9 @@ def split_pdf_by_chunks(source_bucket, file_key, target_bucket, page_chunk_size=
         chunk_key = f"{folder_name}chunk_{chunk_count + 1}.pdf"
         s3_client.upload_file(chunk_key, pdf_bytes, bucket=target_bucket, ContentType="application/pdf")
         logger.info(f"Uploaded {chunk_key}")
+        get_url = f"https://{TARGET_BUCKET_NAME}.s3.{BUCKET_REGION}.amazonaws.com/{chunk_key}"
+        chunks.append({"chunk_key":chunk_key, "original_key": file_key, "get_url": get_url})
         chunk_count += 1
-        chunks.append({"chunk_key":chunk_key, "original_key": file_key})
     return folder_name, chunks
 
 def lambda_handler(event, context):
