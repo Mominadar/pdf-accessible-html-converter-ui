@@ -13,10 +13,12 @@ class ApiService():
         self.db_client = db_client
         self.object_store_client = object_store_client
 
-    def mark_file_status(self, object_key, status):
+    def mark_file_status(self, object_key, status, error_reason=None):
         try:
             self.db_client.find_by_id(object_key)
             self.db_client.put(object_key, "file_status", status) 
+            if error_reason:
+                self.db_client.put(object_key, "error_reason", str(e))
         except Exception as e:
             logger.error(e)
             raise Exception("Could not find file config information")

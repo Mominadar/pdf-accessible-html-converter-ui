@@ -23,7 +23,8 @@ lambda_map = {
     'pdf-accessible-html-convertor': 'main_lambda',
     'pdf-accessible-html-convertor-async': 'file_lambda',
     'pdf-to-accessible-html-step-1-divide-into-chunks': 'split_file_into_chunks',
-    "pdf-accessible-html-step-3-merge-chunks": "merge_chunks"
+    "pdf-accessible-html-step-3-merge-chunks": "merge_chunks",
+    "pdf-accessible-html-error-handler": "converter_error_handler"
 }
 
 client = boto3.client('lambda', region_name=LAMBDA_REGION_NAME)
@@ -142,7 +143,8 @@ def upload(name):
 
 # To run locally
 if __name__ == "__main__":
-    upload("pdf-accessible-html-convertor")
-    upload("pdf-accessible-html-convertor-async")
-    upload("pdf-to-accessible-html-step-1-divide-into-chunks")
-    upload("pdf-accessible-html-step-3-merge-chunks")
+    # upload("pdf-accessible-html-convertor")
+    # upload("pdf-accessible-html-convertor-async")
+    # upload("pdf-to-accessible-html-step-1-divide-into-chunks")
+    # upload("pdf-accessible-html-step-3-merge-chunks")
+    upload("pdf-accessible-html-error-handler")
